@@ -1,0 +1,43 @@
+.tableau-section {
+  margin-bottom: 48px;
+}
+
+table {
+  width: 100%;
+}
+
+.champ-modif {
+  width: 90px;
+}
+
+.en-promo {
+  color: #e53935;
+  font-weight: bold;
+}
+
+.badge-promo {
+  background-color: #e53935;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.stock-bas {
+  color: #e53935;
+  font-weight: bold;
+}
+
+.msg-erreur {
+  color: #e53935;
+  font-size: 11px;
+  display: block;
+}
+
+.champ-erreur {
+  border-color: #e53935 !important;
+}
+
+.btn-tout-envoyer {
+  margin-top: 16px;
+}
