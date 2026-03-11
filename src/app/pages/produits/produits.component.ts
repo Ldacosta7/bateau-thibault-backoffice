@@ -13,8 +13,10 @@ interface ProduitForm {
   produit: Produit;
   stockDelta: number | null;
   nouveauPourcentage: number | null;
+  nouveauPrix: number | null;
   erreurStock: string;
   erreurPromo: string;
+  erreurPrix: string;
 }
 
 @Component({
@@ -29,7 +31,7 @@ interface ProduitForm {
 })
 export class ProduitsComponent implements OnInit {
 
-  colonnes = ['nom', 'prix', 'prixPromo', 'pourcentage', 'stock', 'vendus', 'commentaires', 'modifStock', 'modifPromo'];
+  colonnes = ['nom', 'prix', 'prixPromo', 'pourcentage', 'stock', 'vendus', 'commentaires', 'modifStock', 'modifPromo', 'modifPrix'];
 
   poissons: ProduitForm[] = [];
   fruitsDesMer: ProduitForm[] = [];
@@ -43,8 +45,9 @@ export class ProduitsComponent implements OnInit {
 
   chargerProduits(): void {
     const toForm = (p: Produit): ProduitForm => ({
-      produit: p, stockDelta: null, nouveauPourcentage: null, erreurStock: '', erreurPromo: ''
-    });
+  produit: p, stockDelta: null, nouveauPourcentage: null, nouveauPrix: null,
+  erreurStock: '', erreurPromo: '', erreurPrix: ''
+});
     this.poissons = this.produitsService.getByCategorie('poisson').map(toForm);
     this.fruitsDesMer = this.produitsService.getByCategorie('fruit-de-mer').map(toForm);
     this.crustaces = this.produitsService.getByCategorie('crustace').map(toForm);
@@ -77,6 +80,13 @@ export class ProduitsComponent implements OnInit {
           pf.erreurPromo = 'Entre 0 et 100'; toutValide = false;
         }
       }
+      if (pf.nouveauPrix !== null) {
+        if (isNaN(pf.nouveauPrix)) {
+          pf.erreurPrix = 'Nombre invalide'; toutValide = false;
+        } else if (pf.nouveauPrix <= 0) {
+          pf.erreurPrix = 'Prix doit être positif'; toutValide = false;
+        }
+      }
     });
 
     if (!toutValide) {
@@ -93,6 +103,7 @@ export class ProduitsComponent implements OnInit {
         changes.pourcentagePromotion = pf.nouveauPourcentage;
         changes.enPromotion = pf.nouveauPourcentage > 0;
       }
+      if (pf.nouveauPrix !== null) changes.prix = pf.nouveauPrix;
       if (Object.keys(changes).length > 0) {
         this.produitsService.updateProduit(pf.produit.id, changes);
         nbModifs++;
