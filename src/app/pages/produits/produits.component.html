@@ -1,11 +1,9 @@
 <h1>Gestion des produits</h1>
 
-<!-- BLOC RÉUTILISABLE PAR CATÉGORIE -->
 <ng-container *ngTemplateOutlet="tableauProduits; context: { $implicit: poissons, titre: '🐟 Poissons' }"></ng-container>
 <ng-container *ngTemplateOutlet="tableauProduits; context: { $implicit: fruitsDesMer, titre: '🦪 Fruits de Mer' }"></ng-container>
 <ng-container *ngTemplateOutlet="tableauProduits; context: { $implicit: crustaces, titre: '🦞 Crustacés' }"></ng-container>
 
-<!-- TEMPLATE DU TABLEAU -->
 <ng-template #tableauProduits let-liste let-titre="titre">
   <section class="tableau-section">
     <h2>{{ titre }}</h2>
@@ -58,9 +56,9 @@
         <th mat-header-cell *matHeaderCellDef>Modifier stock</th>
         <td mat-cell *matCellDef="let pf">
           <mat-form-field appearance="outline" class="champ-modif">
-            <input matInput type="number" placeholder="+/-" [(ngModel)]="pf.stockDelta" [class.champ-erreur]="pf.erreurStock">
+            <input matInput type="number" placeholder="+/-" [(ngModel)]="pf.stockDelta">
           </mat-form-field>
-          <mat-error *ngIf="pf.erreurStock" class="msg-erreur">{{ pf.erreurStock }}</mat-error>
+          <span *ngIf="pf.erreurStock" class="msg-erreur">{{ pf.erreurStock }}</span>
         </td>
       </ng-container>
 
@@ -68,18 +66,9 @@
         <th mat-header-cell *matHeaderCellDef>Nouveau % promo</th>
         <td mat-cell *matCellDef="let pf">
           <mat-form-field appearance="outline" class="champ-modif">
-            <input matInput type="number" placeholder="0-100" [(ngModel)]="pf.nouveauPourcentage" [class.champ-erreur]="pf.erreurPromo">
+            <input matInput type="number" placeholder="0-100" [(ngModel)]="pf.nouveauPourcentage">
           </mat-form-field>
-          <mat-error *ngIf="pf.erreurPromo" class="msg-erreur">{{ pf.erreurPromo }}</mat-error>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="action">
-        <th mat-header-cell *matHeaderCellDef>Action</th>
-        <td mat-cell *matCellDef="let pf">
-          <button mat-mini-fab color="primary" (click)="envoyerLigne(pf)" title="Envoyer">
-            <mat-icon>send</mat-icon>
-          </button>
+          <span *ngIf="pf.erreurPromo" class="msg-erreur">{{ pf.erreurPromo }}</span>
         </td>
       </ng-container>
 
@@ -87,8 +76,13 @@
       <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
     </table>
 
-    <button mat-raised-button color="accent" class="btn-tout-envoyer" (click)="toutEnvoyer(liste)">
-      <mat-icon>cloud_upload</mat-icon> Envoyer toutes les données
-    </button>
+    <!-- UN SEUL BOUTON PAR TABLEAU -->
+    <div class="barre-action">
+      <button mat-raised-button color="primary" (click)="toutEnvoyer(liste)">
+        <mat-icon>cloud_upload</mat-icon>
+        Envoyer les modifications du tableau
+      </button>
+    </div>
+
   </section>
 </ng-template>
