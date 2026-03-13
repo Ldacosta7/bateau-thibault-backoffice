@@ -1,0 +1,49 @@
+.filtres {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.nb-resultats {
+  color: #666;
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+}
+
+.badge-type {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-ajout {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-vente {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge-invendus {
+  background-color: #fce4ec;
+  color: #c62828;
+}
+
+.total {
+  font-weight: 600;
+}
+
+.vide {
+  text-align: center;
+  color: #999;
+  margin-top: 48px;
+  font-size: 16px;
+}

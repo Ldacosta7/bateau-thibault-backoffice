@@ -5,18 +5,24 @@ import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { Produit } from '../../core/models/produit.model';
+import { TypeMouvement } from '../../core/models/mouvement.model';
 import { ProduitsService } from '../../core/services/produits.service';
+import { MouvementsService } from '../../core/services/mouvements.service';
 
 interface ProduitForm {
   produit: Produit;
-  stockDelta: number | null;
-  nouveauPourcentage: number | null;
   nouveauPrix: number | null;
-  erreurStock: string;
-  erreurPromo: string;
+  nouveauPourcentage: number | null;
+  typeMouvement: TypeMouvement;
+  quantiteMouvement: number | null;
+  prixMouvement: number | null;
   erreurPrix: string;
+  erreurPromo: string;
+  erreurQuantite: string;
+  erreurPrixMouvement: string;
 }
 
 @Component({
@@ -24,20 +30,30 @@ interface ProduitForm {
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatTableModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule
+    MatButtonModule, MatIconModule, MatSelectModule, MatSnackBarModule
   ],
   templateUrl: './produits.component.html',
   styleUrl: './produits.component.css'
 })
 export class ProduitsComponent implements OnInit {
 
-  colonnes = ['nom', 'prix', 'prixPromo', 'pourcentage', 'stock', 'vendus', 'commentaires', 'modifStock', 'modifPromo', 'modifPrix'];
+  colonnes = ['nom', 'prix', 'prixPromo', 'pourcentage', 'stock', 'vendus', 'commentaires', 'modifPrix', 'modifPromo', 'mouvement'];
+
+  typesMouvement: { valeur: TypeMouvement, label: string }[] = [
+    { valeur: 'ajout', label: 'Ajout de stock' },
+    { valeur: 'retrait-par-vente', label: 'Vente' },
+    { valeur: 'retrait-par-invendus', label: 'Invendus' }
+  ];
 
   poissons: ProduitForm[] = [];
   fruitsDesMer: ProduitForm[] = [];
   crustaces: ProduitForm[] = [];
 
-  constructor(private produitsService: ProduitsService, private snackBar: MatSnackBar) {}
+  constructor(
+    private produitsService: ProduitsService,
+    private mouvementsService: MouvementsService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.chargerProduits();
@@ -45,9 +61,17 @@ export class ProduitsComponent implements OnInit {
 
   chargerProduits(): void {
     const toForm = (p: Produit): ProduitForm => ({
-  produit: p, stockDelta: null, nouveauPourcentage: null, nouveauPrix: null,
-  erreurStock: '', erreurPromo: '', erreurPrix: ''
-});
+      produit: p,
+      nouveauPrix: null,
+      nouveauPourcentage: null,
+      typeMouvement: 'ajout',
+      quantiteMouvement: null,
+      prixMouvement: null,
+      erreurPrix: '',
+      erreurPromo: '',
+      erreurQuantite: '',
+      erreurPrixMouvement: ''
+    });
     this.poissons = this.produitsService.getByCategorie('poisson').map(toForm);
     this.fruitsDesMer = this.produitsService.getByCategorie('fruit-de-mer').map(toForm);
     this.crustaces = this.produitsService.getByCategorie('crustace').map(toForm);
@@ -59,32 +83,46 @@ export class ProduitsComponent implements OnInit {
     return promo.toFixed(2) + ' €';
   }
 
-  toutEnvoyer(liste: ProduitForm[]): void {
-    // Validation de toutes les lignes d'abord
-    let toutValide = true;
-    liste.forEach(pf => {
-      pf.erreurStock = '';
-      pf.erreurPromo = '';
+  getLabelType(type: TypeMouvement): string {
+    return this.typesMouvement.find(t => t.valeur === type)?.label || '';
+  }
 
-      if (pf.stockDelta !== null) {
-        if (isNaN(pf.stockDelta)) {
-          pf.erreurStock = 'Nombre invalide'; toutValide = false;
-        } else if (pf.produit.quantiteStock + pf.stockDelta < 0) {
-          pf.erreurStock = 'Stock ne peut pas être négatif'; toutValide = false;
+  toutEnvoyer(liste: ProduitForm[]): void {
+    let toutValide = true;
+
+    liste.forEach(pf => {
+      pf.erreurPrix = '';
+      pf.erreurPromo = '';
+      pf.erreurQuantite = '';
+      pf.erreurPrixMouvement = '';
+
+      // Validation prix
+      if (pf.nouveauPrix !== null) {
+        if (isNaN(pf.nouveauPrix) || pf.nouveauPrix <= 0) {
+          pf.erreurPrix = 'Prix invalide'; toutValide = false;
         }
       }
+
+      // Validation promo
       if (pf.nouveauPourcentage !== null) {
-        if (isNaN(pf.nouveauPourcentage)) {
-          pf.erreurPromo = 'Nombre invalide'; toutValide = false;
-        } else if (pf.nouveauPourcentage < 0 || pf.nouveauPourcentage > 100) {
+        if (isNaN(pf.nouveauPourcentage) || pf.nouveauPourcentage < 0 || pf.nouveauPourcentage > 100) {
           pf.erreurPromo = 'Entre 0 et 100'; toutValide = false;
         }
       }
-      if (pf.nouveauPrix !== null) {
-        if (isNaN(pf.nouveauPrix)) {
-          pf.erreurPrix = 'Nombre invalide'; toutValide = false;
-        } else if (pf.nouveauPrix <= 0) {
-          pf.erreurPrix = 'Prix doit être positif'; toutValide = false;
+
+      // Validation mouvement
+      if (pf.quantiteMouvement !== null) {
+        if (isNaN(pf.quantiteMouvement) || pf.quantiteMouvement <= 0) {
+          pf.erreurQuantite = 'Quantité invalide'; toutValide = false;
+        }
+        if (pf.typeMouvement !== 'retrait-par-invendus' && (pf.prixMouvement === null || pf.prixMouvement <= 0)) {
+          pf.erreurPrixMouvement = 'Prix requis'; toutValide = false;
+        }
+        const stockApres = pf.typeMouvement === 'ajout'
+          ? pf.produit.quantiteStock + pf.quantiteMouvement
+          : pf.produit.quantiteStock - pf.quantiteMouvement;
+        if (stockApres < 0) {
+          pf.erreurQuantite = 'Stock insuffisant'; toutValide = false;
         }
       }
     });
@@ -94,16 +132,35 @@ export class ProduitsComponent implements OnInit {
       return;
     }
 
-    // Envoi uniquement des lignes modifiées
     let nbModifs = 0;
+
     liste.forEach(pf => {
       const changes: Partial<Produit> = {};
-      if (pf.stockDelta !== null) changes.quantiteStock = pf.produit.quantiteStock + pf.stockDelta;
+
+      if (pf.nouveauPrix !== null) changes.prix = pf.nouveauPrix;
+
       if (pf.nouveauPourcentage !== null) {
         changes.pourcentagePromotion = pf.nouveauPourcentage;
         changes.enPromotion = pf.nouveauPourcentage > 0;
       }
-      if (pf.nouveauPrix !== null) changes.prix = pf.nouveauPrix;
+
+      if (pf.quantiteMouvement !== null) {
+        const estAjout = pf.typeMouvement === 'ajout';
+        const nouveauStock = estAjout
+          ? pf.produit.quantiteStock + pf.quantiteMouvement
+          : pf.produit.quantiteStock - pf.quantiteMouvement;
+        const nouveauxVendus = pf.typeMouvement === 'retrait-par-vente'
+          ? pf.produit.nombreVendus + pf.quantiteMouvement
+          : pf.produit.nombreVendus;
+
+        changes.quantiteStock = nouveauStock;
+        changes.nombreVendus = nouveauxVendus;
+
+        const prixFinal = pf.typeMouvement === 'retrait-par-invendus' ? 0 : (pf.prixMouvement ?? 0);
+        this.mouvementsService.ajouterMouvement(pf.produit, pf.typeMouvement, pf.quantiteMouvement, prixFinal);
+        nbModifs++;
+      }
+
       if (Object.keys(changes).length > 0) {
         this.produitsService.updateProduit(pf.produit.id, changes);
         nbModifs++;
@@ -115,7 +172,7 @@ export class ProduitsComponent implements OnInit {
     if (nbModifs === 0) {
       this.snackBar.open('ℹ️ Aucune modification saisie', 'Fermer', { duration: 3000 });
     } else {
-      this.snackBar.open(`✅ ${nbModifs} produit(s) mis à jour !`, 'Fermer', { duration: 3000 });
+      this.snackBar.open(`✅ Modifications enregistrées !`, 'Fermer', { duration: 3000 });
     }
   }
 }

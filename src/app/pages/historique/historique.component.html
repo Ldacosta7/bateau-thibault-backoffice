@@ -1,0 +1,69 @@
+<h1>Historique des mouvements</h1>
+
+<!-- FILTRES -->
+<div class="filtres">
+  <mat-form-field appearance="outline">
+    <mat-label>Catégorie</mat-label>
+    <mat-select [(ngModel)]="filtreCategorie" (ngModelChange)="actualiser()">
+      <mat-option *ngFor="let c of categories" [value]="c.valeur">{{ c.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Type de mouvement</mat-label>
+    <mat-select [(ngModel)]="filtreType" (ngModelChange)="actualiser()">
+      <mat-option *ngFor="let t of types" [value]="t.valeur">{{ t.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <span class="nb-resultats">{{ mouvements.length }} mouvement(s)</span>
+</div>
+
+<!-- TABLEAU -->
+<table mat-table [dataSource]="mouvements" class="mat-elevation-z2">
+
+  <ng-container matColumnDef="date">
+    <th mat-header-cell *matHeaderCellDef>Date</th>
+    <td mat-cell *matCellDef="let m">{{ m.date | date:'dd/MM/yyyy HH:mm' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="produit">
+    <th mat-header-cell *matHeaderCellDef>Produit</th>
+    <td mat-cell *matCellDef="let m">{{ m.produitNom }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="categorie">
+    <th mat-header-cell *matHeaderCellDef>Catégorie</th>
+    <td mat-cell *matCellDef="let m">{{ getLabelCategorie(m.categorie) }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="type">
+    <th mat-header-cell *matHeaderCellDef>Type</th>
+    <td mat-cell *matCellDef="let m">
+      <span [class]="'badge-type ' + getClassType(m.type)">{{ getLabelType(m.type) }}</span>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="quantite">
+    <th mat-header-cell *matHeaderCellDef>Quantité</th>
+    <td mat-cell *matCellDef="let m">{{ m.quantite }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="prixUnitaire">
+    <th mat-header-cell *matHeaderCellDef>Prix unitaire</th>
+    <td mat-cell *matCellDef="let m">{{ m.prixUnitaire > 0 ? (m.prixUnitaire + ' €') : '—' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="total">
+    <th mat-header-cell *matHeaderCellDef>Total</th>
+    <td mat-cell *matCellDef="let m" class="total">{{ m.total > 0 ? (m.total + ' €') : '—' }}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+  <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
+
+</table>
+
+<div *ngIf="mouvements.length === 0" class="vide">
+  Aucun mouvement enregistré pour le moment.
+</div>
