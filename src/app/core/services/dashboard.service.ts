@@ -139,4 +139,27 @@ export class DashboardService {
       return { categorie: cat, taux: total > 0 ? Math.round((invendus / total) * 100) : 0 };
     });
   }
+
+  getCAParCategorie(annee: number): { categorie: string; ca: number }[] {
+  const categories = ['poisson', 'fruit-de-mer', 'crustace'] as const;
+  return categories.map(cat => {
+    const ca = this.getVentes()
+      .filter(m => m.date.getFullYear() === annee && m.categorie === cat)
+      .reduce((s, m) => s + m.total, 0);
+    return { categorie: cat, ca };
+  });
+}
+
+getVentesVsInvendusParCategorie(annee: number): { categorie: string; ventes: number; invendus: number }[] {
+  const categories = ['poisson', 'fruit-de-mer', 'crustace'] as const;
+  return categories.map(cat => {
+    const ventes = this.mouvementsService.getMouvements()
+      .filter(m => m.date.getFullYear() === annee && m.categorie === cat && m.type === 'retrait-par-vente')
+      .reduce((s, m) => s + m.quantite, 0);
+    const invendus = this.mouvementsService.getMouvements()
+      .filter(m => m.date.getFullYear() === annee && m.categorie === cat && m.type === 'retrait-par-invendus')
+      .reduce((s, m) => s + m.quantite, 0);
+    return { categorie: cat, ventes, invendus };
+  });
+}
 }

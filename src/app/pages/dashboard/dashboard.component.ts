@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { CommonModule, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
@@ -16,7 +16,10 @@ import { DashboardService, KpiTrimestre } from '../../core/services/dashboard.se
 export class DashboardComponent implements OnInit, AfterViewInit {
 
   @ViewChild('barChart') barChartRef!: ElementRef;
-  private chart: Chart | null = null;
+  @ViewChild('pieChart') pieChartRef!: ElementRef;
+  @ViewChild('groupedChart') groupedChartRef!: ElementRef;
+
+  private charts: Chart[] = [];
 
   anneeSelectionnee = 2025;
   annees = [2025, 2024, 2023];
@@ -38,66 +41,113 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-  setTimeout(() => {
-    if (this.chart) {
-      this.chart.destroy();
-      this.chart = null;
-    }
-    this.creerGraphique();
-  }, 100);
-}
+    setTimeout(() => this.creerTousLesGraphiques(), 100);
+  }
 
   charger(): void {
     this.chargerKpis();
-    this.mettreAJourGraphique();
+    this.detruireTousLesGraphiques();
+    setTimeout(() => this.creerTousLesGraphiques(), 100);
   }
 
   chargerKpis(): void {
-  const annee = this.anneeSelectionnee;
-  this.caTotal = this.dashboardService.getCATotal(annee);
-  this.margeAnnuelle = this.dashboardService.getMargeAnnuelle(annee);
-  this.impotPrevisionnel = this.dashboardService.getImpotPrevisionnel(annee);
-  this.valeurStock = this.dashboardService.getValeurStock();
-  this.top3 = this.dashboardService.getTop3Vendus();
-  this.rupturesStock = this.dashboardService.getProduitsSousSeuilStock(5);
-  this.tauxInvendus = this.dashboardService.getTauxInvendusParCategorie();
-  this.trimestres = this.dashboardService.getCAParTrimestre(annee);
-  this.confettisActifs = this.trimestres.some(t => t.confettis);
-
-  
-}
-
-  creerGraphique(): void {
-  if (!this.barChartRef?.nativeElement) return;
-  if (this.chart) {
-    this.chart.destroy();
-    this.chart = null;
+    const annee = this.anneeSelectionnee;
+    this.caTotal = this.dashboardService.getCATotal(annee);
+    this.margeAnnuelle = this.dashboardService.getMargeAnnuelle(annee);
+    this.impotPrevisionnel = this.dashboardService.getImpotPrevisionnel(annee);
+    this.valeurStock = this.dashboardService.getValeurStock();
+    this.top3 = this.dashboardService.getTop3Vendus();
+    this.rupturesStock = this.dashboardService.getProduitsSousSeuilStock(5);
+    this.tauxInvendus = this.dashboardService.getTauxInvendusParCategorie();
+    this.trimestres = this.dashboardService.getCAParTrimestre(annee);
+    this.confettisActifs = this.trimestres.some(t => t.confettis);
   }
-  const mois = this.dashboardService.getCAParMois(this.anneeSelectionnee);
-  this.chart = new Chart(this.barChartRef.nativeElement, {
-    type: 'bar',
-    data: {
-      labels: mois.map(m => m.label),
-      datasets: [
-        { label: "Chiffre d'affaires (€)", data: mois.map(m => m.chiffreAffaires), backgroundColor: '#1a73e8' },
-        { label: 'Marge (€)', data: mois.map(m => m.marge), backgroundColor: '#34a853' }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' } },
-      scales: { y: { beginAtZero: true } }
-    }
-  });
+
+  detruireTousLesGraphiques(): void {
+    this.charts.forEach(c => c.destroy());
+    this.charts = [];
+  }
+
+  creerTousLesGraphiques(): void {
+  console.log('pieRef:', this.pieChartRef);
+  console.log('groupedRef:', this.groupedChartRef);
+  this.creerGraphiqueBarres();
+  this.creerGraphiqueCamembert();
+  this.creerGraphiqueGrouped();
 }
 
-  mettreAJourGraphique(): void {
-    if (!this.chart) return;
+  creerGraphiqueBarres(): void {
+    if (!this.barChartRef?.nativeElement) return;
     const mois = this.dashboardService.getCAParMois(this.anneeSelectionnee);
-    this.chart.data.datasets[0].data = mois.map(m => m.chiffreAffaires);
-    this.chart.data.datasets[1].data = mois.map(m => m.marge);
-    this.chart.update();
+    const chart = new Chart(this.barChartRef.nativeElement, {
+      type: 'bar',
+      data: {
+        labels: mois.map(m => m.label),
+        datasets: [
+          { label: "Chiffre d'affaires (€)", data: mois.map(m => m.chiffreAffaires), backgroundColor: '#1a73e8' },
+          { label: 'Marge (€)', data: mois.map(m => m.marge), backgroundColor: '#34a853' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+    this.charts.push(chart);
+  }
+
+  creerGraphiqueCamembert(): void {
+    if (!this.pieChartRef?.nativeElement) return;
+    const data = this.dashboardService.getCAParCategorie(this.anneeSelectionnee);
+    const chart = new Chart(this.pieChartRef.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels: ['Poissons', 'Fruits de mer', 'Crustacés'],
+        datasets: [{
+          data: data.map(d => d.ca),
+          backgroundColor: ['#1a73e8', '#34a853', '#fa7b17'],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.label} : ${ctx.parsed.toLocaleString('fr-FR')} €`
+            }
+          }
+        }
+      }
+    });
+    this.charts.push(chart);
+  }
+
+  creerGraphiqueGrouped(): void {
+    if (!this.groupedChartRef?.nativeElement) return;
+    const data = this.dashboardService.getVentesVsInvendusParCategorie(this.anneeSelectionnee);
+    const chart = new Chart(this.groupedChartRef.nativeElement, {
+      type: 'bar',
+      data: {
+        labels: ['Poissons', 'Fruits de mer', 'Crustacés'],
+        datasets: [
+          { label: 'Ventes (unités)', data: data.map(d => d.ventes), backgroundColor: '#34a853' },
+          { label: 'Invendus (unités)', data: data.map(d => d.invendus), backgroundColor: '#e53935' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+    this.charts.push(chart);
   }
 
   getLabelCategorie(cat: string): string {

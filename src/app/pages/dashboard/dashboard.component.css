@@ -39,9 +39,26 @@
 .kpi-positif .kpi-value { color: #2e7d32; }
 .kpi-negatif .kpi-value { color: #c62828; }
 
-.graphique-card { margin-bottom: 24px; }
-.graphique-card mat-card-content { padding: 16px; }
+/* GRAPHIQUES */
+.graphiques-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
 
+.graphique-card mat-card-content {
+  padding: 16px;
+  position: relative;
+  height: 300px;
+}
+
+.graphique-card canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* TRIMESTRES */
 .trimestres-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -87,6 +104,7 @@
   border-radius: 10px;
 }
 
+/* PRODUITS */
 .produits-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -159,19 +177,4 @@
   text-align: right;
   font-weight: 600;
   font-size: 14px;
-}
-
-.graphique-card {
-  margin-bottom: 24px;
-}
-
-.graphique-card mat-card-content {
-  padding: 16px;
-  position: relative;
-  height: 350px;
-}
-
-.graphique-card canvas {
-  width: 100% !important;
-  height: 100% !important;
 }

@@ -1,6 +1,5 @@
 <div class="dashboard">
 
-  <!-- HEADER -->
   <div class="dashboard-header">
     <h1>Dashboard</h1>
     <mat-form-field appearance="outline" class="select-annee">
@@ -13,7 +12,6 @@
     </mat-form-field>
   </div>
 
-  <!-- CONFETTIS -->
   @if (confettisActifs) {
     <div class="confettis-banner">Bénéfice exceptionnel ce trimestre !</div>
   }
@@ -49,20 +47,40 @@
     </mat-card>
   </div>
 
-  <!-- GRAPHIQUE -->
-  <mat-card class="graphique-card">
-    <mat-card-header>
-      <mat-card-title>CA et Marge par mois</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <canvas #barChart></canvas>
-    </mat-card-content>
-  </mat-card>
+  <!-- GRAPHIQUES -->
+  <div class="graphiques-grid">
+
+    <mat-card class="graphique-card large">
+      <mat-card-header>
+        <mat-card-title>CA et Marge par mois</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas #barChart></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="graphique-card">
+      <mat-card-header>
+        <mat-card-title>Répartition du CA par catégorie</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas #pieChart></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="graphique-card">
+      <mat-card-header>
+        <mat-card-title>Ventes vs Invendus par catégorie</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas #groupedChart></canvas>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
 
   <!-- TRIMESTRES -->
   <h2>Détail par trimestre</h2>
-  <p>Nombre de trimestres : {{ trimestres.length }}</p>
-  <p>Nombre top3 : {{ top3.length }}</p>
   <div class="trimestres-grid">
     @for (t of trimestres; track t.trimestre) {
       <mat-card class="trimestre-card"
