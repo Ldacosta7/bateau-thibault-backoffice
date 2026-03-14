@@ -1,25 +1,27 @@
 <h1>Historique des mouvements</h1>
 
-<!-- FILTRES -->
 <div class="filtres">
   <mat-form-field appearance="outline">
     <mat-label>Catégorie</mat-label>
     <mat-select [(ngModel)]="filtreCategorie" (ngModelChange)="actualiser()">
-      <mat-option *ngFor="let c of categories" [value]="c.valeur">{{ c.label }}</mat-option>
+      @for (c of categories; track c.valeur) {
+        <mat-option [value]="c.valeur">{{ c.label }}</mat-option>
+      }
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline">
     <mat-label>Type de mouvement</mat-label>
     <mat-select [(ngModel)]="filtreType" (ngModelChange)="actualiser()">
-      <mat-option *ngFor="let t of types" [value]="t.valeur">{{ t.label }}</mat-option>
+      @for (t of types; track t.valeur) {
+        <mat-option [value]="t.valeur">{{ t.label }}</mat-option>
+      }
     </mat-select>
   </mat-form-field>
 
   <span class="nb-resultats">{{ mouvements.length }} mouvement(s)</span>
 </div>
 
-<!-- TABLEAU -->
 <table mat-table [dataSource]="mouvements" class="mat-elevation-z2">
 
   <ng-container matColumnDef="date">
@@ -64,6 +66,6 @@
 
 </table>
 
-<div *ngIf="mouvements.length === 0" class="vide">
-  Aucun mouvement enregistré pour le moment.
-</div>
+@if (mouvements.length === 0) {
+  <div class="vide">Aucun mouvement enregistré pour le moment.</div>
+}

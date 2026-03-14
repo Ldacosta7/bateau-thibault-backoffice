@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,7 @@ import { DashboardService, KpiTrimestre } from '../../core/services/dashboard.se
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSelectModule, MatCardModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, MatSelectModule, MatCardModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -38,8 +38,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+  setTimeout(() => {
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
     this.creerGraphique();
-  }
+  }, 100);
+}
 
   charger(): void {
     this.chargerKpis();
@@ -47,36 +53,44 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   chargerKpis(): void {
-    const annee = this.anneeSelectionnee;
-    this.caTotal = this.dashboardService.getCATotal(annee);
-    this.margeAnnuelle = this.dashboardService.getMargeAnnuelle(annee);
-    this.impotPrevisionnel = this.dashboardService.getImpotPrevisionnel(annee);
-    this.valeurStock = this.dashboardService.getValeurStock();
-    this.top3 = this.dashboardService.getTop3Vendus();
-    this.rupturesStock = this.dashboardService.getProduitsSousSeuilStock(5);
-    this.tauxInvendus = this.dashboardService.getTauxInvendusParCategorie();
-    this.trimestres = this.dashboardService.getCAParTrimestre(annee);
-    this.confettisActifs = this.trimestres.some(t => t.confettis);
-  }
+  const annee = this.anneeSelectionnee;
+  this.caTotal = this.dashboardService.getCATotal(annee);
+  this.margeAnnuelle = this.dashboardService.getMargeAnnuelle(annee);
+  this.impotPrevisionnel = this.dashboardService.getImpotPrevisionnel(annee);
+  this.valeurStock = this.dashboardService.getValeurStock();
+  this.top3 = this.dashboardService.getTop3Vendus();
+  this.rupturesStock = this.dashboardService.getProduitsSousSeuilStock(5);
+  this.tauxInvendus = this.dashboardService.getTauxInvendusParCategorie();
+  this.trimestres = this.dashboardService.getCAParTrimestre(annee);
+  this.confettisActifs = this.trimestres.some(t => t.confettis);
+
+  
+}
 
   creerGraphique(): void {
-    const mois = this.dashboardService.getCAParMois(this.anneeSelectionnee);
-    this.chart = new Chart(this.barChartRef.nativeElement, {
-      type: 'bar',
-      data: {
-        labels: mois.map(m => m.label),
-        datasets: [
-          { label: "Chiffre d'affaires (€)", data: mois.map(m => m.chiffreAffaires), backgroundColor: '#1a73e8' },
-          { label: 'Marge (€)', data: mois.map(m => m.marge), backgroundColor: '#34a853' }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'top' } },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
+  if (!this.barChartRef?.nativeElement) return;
+  if (this.chart) {
+    this.chart.destroy();
+    this.chart = null;
   }
+  const mois = this.dashboardService.getCAParMois(this.anneeSelectionnee);
+  this.chart = new Chart(this.barChartRef.nativeElement, {
+    type: 'bar',
+    data: {
+      labels: mois.map(m => m.label),
+      datasets: [
+        { label: "Chiffre d'affaires (€)", data: mois.map(m => m.chiffreAffaires), backgroundColor: '#1a73e8' },
+        { label: 'Marge (€)', data: mois.map(m => m.marge), backgroundColor: '#34a853' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
 
   mettreAJourGraphique(): void {
     if (!this.chart) return;

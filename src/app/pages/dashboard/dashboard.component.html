@@ -1,8 +1,138 @@
-<mat-card class="graphique-card">
-  <mat-card-header>
-    <mat-card-title>CA et Marge par mois</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <canvas #barChart></canvas>
-  </mat-card-content>
-</mat-card>
+<div class="dashboard">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <mat-form-field appearance="outline" class="select-annee">
+      <mat-label>Année</mat-label>
+      <mat-select [(ngModel)]="anneeSelectionnee" (ngModelChange)="charger()">
+        @for (a of annees; track a) {
+          <mat-option [value]="a">{{ a }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- CONFETTIS -->
+  @if (confettisActifs) {
+    <div class="confettis-banner">Bénéfice exceptionnel ce trimestre !</div>
+  }
+
+  <!-- KPIs FINANCIERS -->
+  <div class="kpi-grid">
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Chiffre d'affaires annuel</div>
+        <div class="kpi-value">{{ caTotal | number:'1.0-0' }} €</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card" [class.kpi-negatif]="margeAnnuelle < 0" [class.kpi-positif]="margeAnnuelle > 0">
+      <mat-card-content>
+        <div class="kpi-label">Marge annuelle</div>
+        <div class="kpi-value">{{ margeAnnuelle | number:'1.0-0' }} €</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Impôt prévisionnel (30%)</div>
+        <div class="kpi-value">{{ impotPrevisionnel | number:'1.0-0' }} €</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Valeur du stock</div>
+        <div class="kpi-value">{{ valeurStock | number:'1.0-0' }} €</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- GRAPHIQUE -->
+  <mat-card class="graphique-card">
+    <mat-card-header>
+      <mat-card-title>CA et Marge par mois</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <canvas #barChart></canvas>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- TRIMESTRES -->
+  <h2>Détail par trimestre</h2>
+  <p>Nombre de trimestres : {{ trimestres.length }}</p>
+  <p>Nombre top3 : {{ top3.length }}</p>
+  <div class="trimestres-grid">
+    @for (t of trimestres; track t.trimestre) {
+      <mat-card class="trimestre-card"
+        [class.alerte-negative]="t.alerteNegative"
+        [class.confettis-card]="t.confettis">
+        <mat-card-content>
+          <div class="trimestre-titre">
+            {{ t.label }}
+            @if (t.alerteNegative) {
+              <span class="badge-alerte">Marge négative</span>
+            }
+            @if (t.confettis) {
+              <span class="badge-confettis">Exceptionnel</span>
+            }
+          </div>
+          <div class="trimestre-ligne">CA : <strong>{{ t.chiffreAffaires | number:'1.0-0' }} €</strong></div>
+          <div class="trimestre-ligne">Achats : <strong>{{ t.achats | number:'1.0-0' }} €</strong></div>
+          <div class="trimestre-ligne" [class.negatif]="t.marge < 0">
+            Marge : <strong>{{ t.marge | number:'1.0-0' }} €</strong>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- KPIs PRODUITS -->
+  <div class="produits-grid">
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Top 3 produits vendus</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @for (p of top3; track p.nom; let i = $index) {
+          <div class="top-ligne">
+            <span class="top-rang">{{ i + 1 }}</span>
+            <span class="top-nom">{{ p.nom }}</span>
+            <span class="top-total">{{ p.total }} unités</span>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card [class.alerte-negative]="rupturesStock.length > 0">
+      <mat-card-header><mat-card-title>Stocks faibles</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @if (rupturesStock.length === 0) {
+          <div class="aucun">Aucun produit en rupture</div>
+        }
+        @for (p of rupturesStock; track p.nom) {
+          <div class="rupture-ligne">
+            <span>{{ p.nom }}</span>
+            <span class="stock-critique">{{ p.stock }} restants</span>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Taux d'invendus</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @for (t of tauxInvendus; track t.categorie) {
+          <div class="invendus-ligne">
+            <span class="invendus-label">{{ getLabelCategorie(t.categorie) }}</span>
+            <div class="barre-conteneur">
+              <div class="barre-remplissage" [style.width.%]="t.taux"></div>
+            </div>
+            <span class="taux-valeur">{{ t.taux }}%</span>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

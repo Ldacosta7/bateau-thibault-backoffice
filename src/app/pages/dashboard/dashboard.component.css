@@ -1,0 +1,177 @@
+.dashboard { padding: 8px; }
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.select-annee { width: 120px; }
+
+.confettis-banner {
+  background: linear-gradient(90deg, #f9d423, #ff4e50);
+  color: white;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 24px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card { text-align: center; padding: 8px; }
+.kpi-label { font-size: 13px; color: #666; margin-bottom: 8px; }
+.kpi-value { font-size: 28px; font-weight: 700; color: #1a73e8; }
+.kpi-positif .kpi-value { color: #2e7d32; }
+.kpi-negatif .kpi-value { color: #c62828; }
+
+.graphique-card { margin-bottom: 24px; }
+.graphique-card mat-card-content { padding: 16px; }
+
+.trimestres-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.trimestre-titre {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trimestre-ligne { margin-bottom: 6px; font-size: 14px; }
+.negatif { color: #c62828; }
+
+.alerte-negative {
+  border-left: 4px solid #c62828 !important;
+  background-color: #fff8f8 !important;
+}
+
+.confettis-card {
+  border-left: 4px solid #f9d423 !important;
+  background-color: #fffde7 !important;
+}
+
+.badge-alerte {
+  font-size: 11px;
+  background: #ffebee;
+  color: #c62828;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.badge-confettis {
+  font-size: 11px;
+  background: #fffde7;
+  color: #f57f17;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.produits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.top-ligne {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.top-rang {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1a73e8;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.top-nom { flex: 1; font-size: 14px; }
+.top-total { font-weight: 600; color: #1a73e8; font-size: 14px; }
+
+.rupture-ligne {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.stock-critique { color: #c62828; font-weight: 600; }
+.aucun { color: #2e7d32; padding: 8px 0; font-size: 14px; }
+
+.invendus-ligne {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.invendus-label { width: 110px; font-size: 14px; }
+
+.barre-conteneur {
+  flex: 1;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barre-remplissage {
+  height: 100%;
+  background: #e53935;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.taux-valeur {
+  width: 35px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.graphique-card {
+  margin-bottom: 24px;
+}
+
+.graphique-card mat-card-content {
+  padding: 16px;
+  position: relative;
+  height: 350px;
+}
+
+.graphique-card canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
