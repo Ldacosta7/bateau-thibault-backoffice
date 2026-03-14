@@ -21,8 +21,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   private charts: Chart[] = [];
 
-  anneeSelectionnee = 2025;
-  annees = [2025, 2024, 2023];
+  anneeSelectionnee = 2026;
+  annees = [2026, 2025, 2024, 2023];
 
   caTotal = 0;
   margeAnnuelle = 0;
