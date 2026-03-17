@@ -38,7 +38,7 @@
         <div class="kpi-value">{{ impotPrevisionnel | number:'1.0-0' }} €</div>
       </mat-card-content>
     </mat-card>
-
+<!--
     <mat-card class="kpi-card">
       <mat-card-content>
         <div class="kpi-label">Valeur du stock</div>
@@ -46,7 +46,7 @@
       </mat-card-content>
     </mat-card>
   </div>
-
+-->
   <!-- GRAPHIQUES -->
   <div class="graphiques-grid">
 
@@ -122,7 +122,7 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card [class.alerte-negative]="rupturesStock.length > 0">
+    <!--<mat-card [class.alerte-negative]="rupturesStock.length > 0">
       <mat-card-header><mat-card-title>Stocks faibles</mat-card-title></mat-card-header>
       <mat-card-content>
         @if (rupturesStock.length === 0) {
@@ -135,14 +135,14 @@
           </div>
         }
       </mat-card-content>
-    </mat-card>
+    </mat-card>-->
 
     <mat-card>
       <mat-card-header><mat-card-title>Taux d'invendus</mat-card-title></mat-card-header>
       <mat-card-content>
         @for (t of tauxInvendus; track t.categorie) {
           <div class="invendus-ligne">
-            <span class="invendus-label">{{ getLabelCategorie(t.categorie) }}</span>
+            <!--<span class="invendus-label">{{ getLabelCategorie(t.categorie) }}</span>-->
             <div class="barre-conteneur">
               <div class="barre-remplissage" [style.width.%]="t.taux"></div>
             </div>

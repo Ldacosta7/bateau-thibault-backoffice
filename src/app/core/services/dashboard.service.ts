@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { MouvementsService } from './mouvements.service';
 import { ProduitsService } from './produits.service';
 import { Mouvement } from '../models/mouvement.model';
+import { firstValueFrom } from 'rxjs';
 
 export interface KpiPeriode {
   label: string;
@@ -96,13 +97,11 @@ export class DashboardService {
     return marge > 0 ? marge * 0.3 : 0;
   }
 
-  getValeurStock(): number {
-    const produits = [
-      ...this.produitsService.getByCategorie('poisson'),
-      ...this.produitsService.getByCategorie('fruit-de-mer'),
-      ...this.produitsService.getByCategorie('crustace'),
-    ];
-    return produits.reduce((s, p) => s + p.prix * p.quantiteStock, 0);
+  async getValeurStock(): Promise<number> {
+    const produits = await firstValueFrom(
+      this.produitsService.getProduits());
+
+    return produits.reduce((s, p) => s + p.prix * p.stock, 0);
   }
 
   getTop3Vendus(): { nom: string; total: number }[] {
@@ -116,19 +115,17 @@ export class DashboardService {
       .slice(0, 3);
   }
 
-  getProduitsSousSeuilStock(seuil = 5): { nom: string; stock: number }[] {
-    const produits = [
-      ...this.produitsService.getByCategorie('poisson'),
-      ...this.produitsService.getByCategorie('fruit-de-mer'),
-      ...this.produitsService.getByCategorie('crustace'),
-    ];
+  async getProduitsSousSeuilStock(seuil = 5): Promise<{ nom: string; stock: number }[]> {
+    const produits = await firstValueFrom(
+      this.produitsService.getProduits()
+    );
     return produits
-      .filter(p => p.quantiteStock <= seuil)
-      .map(p => ({ nom: p.nom, stock: p.quantiteStock }));
+      .filter(p => p.stock <= seuil)
+      .map(p => ({ nom: p.nom, stock: p.stock }));
   }
 
-  getTauxInvendusParCategorie(): { categorie: string; taux: number }[] {
-    const categories = ['poisson', 'fruit-de-mer', 'crustace'] as const;
+  getTauxInvendusParCategorie(): { categorie: number; taux: number }[] {
+    const categories = [0, 1, 2] as const;
     return categories.map(cat => {
       const invendus = this.mouvementsService.getMouvements()
         .filter(m => m.categorie === cat && m.type === 'retrait-par-invendus')
@@ -140,8 +137,8 @@ export class DashboardService {
     });
   }
 
-  getCAParCategorie(annee: number): { categorie: string; ca: number }[] {
-  const categories = ['poisson', 'fruit-de-mer', 'crustace'] as const;
+  getCAParCategorie(annee: number): { categorie: number; ca: number }[] {
+  const categories = [0, 1, 2] as const;
   return categories.map(cat => {
     const ca = this.getVentes()
       .filter(m => m.date.getFullYear() === annee && m.categorie === cat)
@@ -150,8 +147,8 @@ export class DashboardService {
   });
 }
 
-getVentesVsInvendusParCategorie(annee: number): { categorie: string; ventes: number; invendus: number }[] {
-  const categories = ['poisson', 'fruit-de-mer', 'crustace'] as const;
+getVentesVsInvendusParCategorie(annee: number): { categorie: number; ventes: number; invendus: number }[] {
+  const categories = [0, 1, 2] as const;
   return categories.map(cat => {
     const ventes = this.mouvementsService.getMouvements()
       .filter(m => m.date.getFullYear() === annee && m.categorie === cat && m.type === 'retrait-par-vente')

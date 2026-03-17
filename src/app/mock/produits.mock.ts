@@ -1,5 +1,5 @@
 import { Produit } from '../core/models/produit.model';
-
+/*
 export const PRODUITS_MOCK: Produit[] = [
   // Poissons
   { id: 1, nom: 'Bar de ligne', categorie: 'poisson', prix: 28, enPromotion: false, pourcentagePromotion: 0, quantiteStock: 15, nombreVendus: 42, commentaires: 'Arrivage du mardi' },
@@ -13,4 +13,4 @@ export const PRODUITS_MOCK: Produit[] = [
   { id: 7, nom: 'Homard breton', categorie: 'crustace', prix: 55, enPromotion: false, pourcentagePromotion: 0, quantiteStock: 6, nombreVendus: 12, commentaires: 'Vivant' },
   { id: 8, nom: 'Araignée de mer', categorie: 'crustace', prix: 20, enPromotion: true, pourcentagePromotion: 30, quantiteStock: 10, nombreVendus: 28, commentaires: '' },
   { id: 9, nom: 'Langoustine', categorie: 'crustace', prix: 32, enPromotion: false, pourcentagePromotion: 0, quantiteStock: 12, nombreVendus: 40, commentaires: 'Arrivage du jeudi' },
-];
+];*/

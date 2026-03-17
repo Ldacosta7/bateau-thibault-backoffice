@@ -1,16 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Produit } from '../../core/models/produit.model';
 import { TypeMouvement } from '../../core/models/mouvement.model';
 import { ProduitsService } from '../../core/services/produits.service';
 import { MouvementsService } from '../../core/services/mouvements.service';
+import { firstValueFrom } from 'rxjs';
 
 interface ProduitForm {
   produit: Produit;
@@ -27,11 +21,7 @@ interface ProduitForm {
 
 @Component({
   selector: 'app-produits',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, MatTableModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatSelectModule, MatSnackBarModule
-  ],
+  standalone: false,
   templateUrl: './produits.component.html',
   styleUrl: './produits.component.css'
 })
@@ -57,9 +47,15 @@ export class ProduitsComponent implements OnInit {
 
   ngOnInit(): void {
     this.chargerProduits();
+    this.produitsService.getProduits();
   }
 
-  chargerProduits(): void {
+  async chargerProduits(): Promise<void> {
+
+    const produits = await firstValueFrom(
+      this.produitsService.getProduits()
+    );
+
     const toForm = (p: Produit): ProduitForm => ({
       produit: p,
       nouveauPrix: null,
@@ -72,14 +68,15 @@ export class ProduitsComponent implements OnInit {
       erreurQuantite: '',
       erreurPrixMouvement: ''
     });
-    this.poissons = this.produitsService.getByCategorie('poisson').map(toForm);
-    this.fruitsDesMer = this.produitsService.getByCategorie('fruit-de-mer').map(toForm);
-    this.crustaces = this.produitsService.getByCategorie('crustace').map(toForm);
+    this.poissons = produits.filter(p => p.categorie === 0).map(toForm);
+    console.log(this.poissons);
+    this.fruitsDesMer = produits.filter(p => p.categorie === 1).map(toForm);
+    this.crustaces = produits.filter(p => p.categorie === 2).map(toForm);
   }
 
   getPrixPromo(pf: ProduitForm): string {
-    if (!pf.produit.enPromotion) return '—';
-    const promo = pf.produit.prix * (1 - pf.produit.pourcentagePromotion / 100);
+    if (pf.produit.promo != 0) return '—';
+    const promo = pf.produit.prix * (1 - pf.produit.promo / 100);
     return promo.toFixed(2) + ' €';
   }
 
@@ -119,8 +116,8 @@ export class ProduitsComponent implements OnInit {
           pf.erreurPrixMouvement = 'Prix requis'; toutValide = false;
         }
         const stockApres = pf.typeMouvement === 'ajout'
-          ? pf.produit.quantiteStock + pf.quantiteMouvement
-          : pf.produit.quantiteStock - pf.quantiteMouvement;
+          ? pf.produit.stock + pf.quantiteMouvement
+          : pf.produit.stock - pf.quantiteMouvement;
         if (stockApres < 0) {
           pf.erreurQuantite = 'Stock insuffisant'; toutValide = false;
         }
@@ -140,21 +137,20 @@ export class ProduitsComponent implements OnInit {
       if (pf.nouveauPrix !== null) changes.prix = pf.nouveauPrix;
 
       if (pf.nouveauPourcentage !== null) {
-        changes.pourcentagePromotion = pf.nouveauPourcentage;
-        changes.enPromotion = pf.nouveauPourcentage > 0;
+        changes.promo = pf.nouveauPourcentage;
       }
 
       if (pf.quantiteMouvement !== null) {
         const estAjout = pf.typeMouvement === 'ajout';
         const nouveauStock = estAjout
-          ? pf.produit.quantiteStock + pf.quantiteMouvement
-          : pf.produit.quantiteStock - pf.quantiteMouvement;
+          ? pf.produit.stock + pf.quantiteMouvement
+          : pf.produit.stock - pf.quantiteMouvement;
         const nouveauxVendus = pf.typeMouvement === 'retrait-par-vente'
-          ? pf.produit.nombreVendus + pf.quantiteMouvement
-          : pf.produit.nombreVendus;
+          ? pf.produit.unite + pf.quantiteMouvement
+          : pf.produit.unite;
 
-        changes.quantiteStock = nouveauStock;
-        changes.nombreVendus = nouveauxVendus;
+        changes.stock = nouveauStock;
+        changes.unite = nouveauxVendus;
 
         const prixFinal = pf.typeMouvement === 'retrait-par-invendus' ? 0 : (pf.prixMouvement ?? 0);
         this.mouvementsService.ajouterMouvement(pf.produit, pf.typeMouvement, pf.quantiteMouvement, prixFinal);
@@ -162,7 +158,7 @@ export class ProduitsComponent implements OnInit {
       }
 
       if (Object.keys(changes).length > 0) {
-        this.produitsService.updateProduit(pf.produit.id, changes);
+        //this.produitsService.updateProduit(pf.produit.id, changes);
         nbModifs++;
       }
     });

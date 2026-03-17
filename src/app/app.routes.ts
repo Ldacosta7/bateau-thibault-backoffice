@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 import { ProduitsComponent } from './pages/produits/produits.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { HistoriqueComponent } from './pages/historique/historique.component';
@@ -9,3 +10,9 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'historique', component: HistoriqueComponent}
 ];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

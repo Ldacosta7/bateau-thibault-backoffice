@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Mouvement, TypeMouvement } from '../models/mouvement.model';
 import { Produit } from '../models/produit.model';
-import { PRODUITS_MOCK } from '../../mock/produits.mock';
+//import { PRODUITS_MOCK } from '../../mock/produits.mock';
 
 @Injectable({ providedIn: 'root' })
 export class MouvementsService {
@@ -12,7 +12,7 @@ export class MouvementsService {
   private genererHistorique(): Mouvement[] {
     const mouvements: Mouvement[] = [];
     let id = 1;
-    const produits = PRODUITS_MOCK;
+    //const produits = PRODUITS_MOCK;
 
     const ajout = (produit: any, type: TypeMouvement, quantite: number, prix: number, date: Date) => {
       mouvements.push({
@@ -24,7 +24,7 @@ export class MouvementsService {
 
     const d = (mois: number, jour: number) => new Date(2025, mois - 1, jour);
 
-    // JANVIER
+    /*// JANVIER
     ajout(produits[0], 'ajout', 20, 15, d(1, 2));
     ajout(produits[0], 'retrait-par-vente', 8, 28, d(1, 5));
     ajout(produits[1], 'ajout', 15, 12, d(1, 3));
@@ -134,7 +134,7 @@ export class MouvementsService {
     ajout(produits[8], 'retrait-par-vente', 25, 32, d(12, 18));
     ajout(produits[3], 'ajout', 100, 5, d(12, 5));
     ajout(produits[3], 'retrait-par-vente', 85, 12, d(12, 20));
-    ajout(produits[7], 'retrait-par-invendus', 2, 0, d(12, 28));
+    ajout(produits[7], 'retrait-par-invendus', 2, 0, d(12, 28));*/
 
     return mouvements.sort((a, b) => b.date.getTime() - a.date.getTime());
   }
@@ -155,7 +155,7 @@ export class MouvementsService {
     return this.mouvements;
   }
 
-  getMouvementsFiltres(categorie?: string, type?: string): Mouvement[] {
+  getMouvementsFiltres(categorie?: number, type?: string): Mouvement[] {
     return this.mouvements.filter(m => {
       const matchCategorie = !categorie || m.categorie === categorie;
       const matchType = !type || m.type === type;

@@ -8,8 +8,7 @@ import { DashboardService, KpiTrimestre } from '../../core/services/dashboard.se
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, DecimalPipe, FormsModule, MatSelectModule, MatCardModule],
+  standalone: false,
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -27,10 +26,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   caTotal = 0;
   margeAnnuelle = 0;
   impotPrevisionnel = 0;
-  valeurStock = 0;
+  valeurStock : Promise<number> | undefined;
   top3: { nom: string; total: number }[] = [];
-  rupturesStock: { nom: string; stock: number }[] = [];
-  tauxInvendus: { categorie: string; taux: number }[] = [];
+  rupturesStock: Promise<{ nom: string; stock: number; }[]> | undefined ;
+  tauxInvendus: { categorie: number; taux: number }[] = [];
   trimestres: KpiTrimestre[] = [];
   confettisActifs = false;
 
@@ -150,10 +149,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.charts.push(chart);
   }
 
-  getLabelCategorie(cat: string): string {
+  getLabelCategorie(cat: number): string {
     const map: Record<string, string> = {
-      'poisson': 'Poissons', 'fruit-de-mer': 'Fruits de mer', 'crustace': 'Crustacés'
+      1: 'Poissons', 2: 'Fruits de mer', 3: 'Crustacés'
     };
-    return map[cat] || cat;
+    return map[String(cat)] || String(cat);
   }
 }

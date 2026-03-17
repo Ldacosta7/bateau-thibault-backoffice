@@ -10,8 +10,7 @@ import { MouvementsService } from '../../core/services/mouvements.service';
 
 @Component({
   selector: 'app-historique',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatTableModule, MatSelectModule, MatInputModule, MatChipsModule],
+  standalone: false,
   templateUrl: './historique.component.html',
   styleUrl: './historique.component.css'
 })
@@ -19,7 +18,7 @@ export class HistoriqueComponent implements OnInit {
 
   colonnes = ['date', 'produit', 'categorie', 'type', 'quantite', 'prixUnitaire', 'total'];
 
-  filtreCategorie = '';
+  filtreCategorie = 0;
   filtreType = '';
 
   categories = [

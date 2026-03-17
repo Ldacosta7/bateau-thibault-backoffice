@@ -4,7 +4,7 @@ export interface Mouvement {
   id: number;
   produitId: number;
   produitNom: string;
-  categorie: 'poisson' | 'fruit-de-mer' | 'crustace';
+  categorie: number;
   type: TypeMouvement;
   quantite: number;
   prixUnitaire: number;
