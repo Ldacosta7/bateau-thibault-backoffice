@@ -47,10 +47,10 @@
 
       <form class="register-form" (ngSubmit)="onSubmit()" #registerForm="ngForm">
 
-        <!-- Prénom + Nom -->
+        <!-- Username -->
         <div class="row-fields">
           <div class="field-group">
-            <label class="field-label" for="prenom">Prénom</label>
+            <label class="field-label" for="username">Nom d'utilisateur</label>
             <div class="input-wrapper">
               <span class="input-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -58,25 +58,11 @@
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
               </span>
-              <input type="text" id="prenom" name="prenom" [(ngModel)]="registerData.prenom"
+              <input type="text" id="username" name="username" [(ngModel)]="registerData.username"
                 required placeholder="Jean" class="form-input" autocomplete="given-name"/>
             </div>
           </div>
-          <div class="field-group">
-            <label class="field-label" for="nom">Nom</label>
-            <div class="input-wrapper">
-              <span class="input-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </span>
-              <input type="text" id="nom" name="nom" [(ngModel)]="registerData.nom"
-                required placeholder="Dupont" class="form-input" autocomplete="family-name"/>
-            </div>
-          </div>
         </div>
-
         <!-- Email -->
         <div class="field-group">
           <label class="field-label" for="email">Adresse email</label>
@@ -91,21 +77,6 @@
               required placeholder="votre@email.com" class="form-input" autocomplete="email"/>
           </div>
         </div>
-
-        <!-- Téléphone -->
-        <div class="field-group">
-          <label class="field-label" for="telephone">Téléphone <span class="optional">(optionnel)</span></label>
-          <div class="input-wrapper">
-            <span class="input-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-            </span>
-            <input type="tel" id="telephone" name="telephone" [(ngModel)]="registerData.telephone"
-              placeholder="+33 6 00 00 00 00" class="form-input" autocomplete="tel"/>
-          </div>
-        </div>
-
         <!-- Mot de passe -->
         <div class="field-group">
           <label class="field-label" for="password">Mot de passe</label>

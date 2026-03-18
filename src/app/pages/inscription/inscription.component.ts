@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../core/services/auth.service';
 
 interface Bubble {
   left:     string;
@@ -27,34 +27,37 @@ interface StrengthLabel {
 export class InscriptionComponent implements OnInit {
 
   registerData = {
-    prenom:          '',
-    nom:             '',
-    email:           '',
-    telephone:       '',
-    password:        '',
+    username:'',
+    email:'',
+    telephone:'',
+    password:'',
     confirmPassword: '',
-    cgu:             false
+    cgu:false
   };
 
-  showPassword  = false;
-  showConfirm   = false;
-  isLoading     = false;
-  isFloating    = true;
-  strength      = 0;
-  errorMessage  = '';
+  showPassword = false;
+  showConfirm  = false;
+  isLoading    = false;
+  isFloating   = true;
+  strength     = 0;
+  errorMessage = '';
 
   bubbles: Bubble[] = [];
 
-  private apiUrl = 'http://127.0.0.1:8000/users';
-
   constructor(
-    private http: HttpClient,
+    private authService: AuthService,
     private router: Router
   ) {}
 
-  toggleFloat(): void {
-    this.isFloating = false;
+  ngOnInit(): void {
+    if (this.authService.isConnected()) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+    this.generateBubbles();
   }
+
+  toggleFloat(): void { this.isFloating = false; }
 
   get passwordMismatch(): boolean {
     return !!this.registerData.confirmPassword &&
@@ -69,10 +72,6 @@ export class InscriptionComponent implements OnInit {
       case 4:  return { text: 'Très fort', class: 'strong' };
       default: return { text: '',          class: ''       };
     }
-  }
-
-  ngOnInit(): void {
-    this.generateBubbles();
   }
 
   generateBubbles(): void {
@@ -101,33 +100,32 @@ export class InscriptionComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isLoading || this.passwordMismatch) return;
-    this.isLoading   = true;
+    this.isLoading    = true;
     this.errorMessage = '';
 
-    // Le username est construit à partir du prénom + nom
-    const payload = {
-      username: `${this.registerData.prenom} ${this.registerData.nom}`.trim(),
-      email:    this.registerData.email,
-      password: this.registerData.password
-    };
+    const username = `${this.registerData.username}`.trim();
 
-    this.http.post(this.apiUrl, payload).subscribe({
-      next: (response) => {
-        console.log('Inscription réussie :', response);
-        this.isLoading = false;
-        this.router.navigate(['/connexion']);
+    this.authService.register(username, this.registerData.email, this.registerData.password).subscribe({
+      next: () => {
+        this.authService.login(username, this.registerData.password).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']);
+          },
+          error: () => {
+            this.isLoading = false;
+            this.router.navigate(['/connexion']);
+          }
+        });
       },
       error: (err) => {
-        console.error(err);
         this.isLoading = false;
-
-        // Gestion des erreurs retournées par Django
         if (err.error?.username) {
           this.errorMessage = 'Ce nom d\'utilisateur est déjà pris.';
         } else if (err.error?.email) {
           this.errorMessage = 'Cette adresse email est déjà utilisée.';
-        } else if (err.error?.password) {
-          this.errorMessage = 'Mot de passe invalide : ' + err.error.password.join(' ');
+        } else if (err.status === 0) {
+          this.errorMessage = 'Impossible de joindre le serveur.';
         } else {
           this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
         }
