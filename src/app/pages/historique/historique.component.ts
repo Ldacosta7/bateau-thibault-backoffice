@@ -42,14 +42,6 @@ export class HistoriqueComponent implements OnInit {
     this.actualiser();
   }
 
-  async actualiser(): Promise<void> {
-    const historique = await firstValueFrom(this.mouvementsService.getHistorique());
-    if(this.filtreCategorie == undefined && this.filtreType == ''){
-      this.mouvements = historique;
-    }else if(this.filtreType != '' &&this.filtreCategorie != undefined){      this.tousLesMouvements = historique;
-    this.appliquerFiltres();
-  }
-
   appliquerFiltres(): void {
     this.mouvements = this.tousLesMouvements.filter(h => {
       const matchCat  = !this.filtreCategorie || h.categorie === this.filtreCategorie;
@@ -57,8 +49,19 @@ export class HistoriqueComponent implements OnInit {
       return matchCat && matchType;
     });
   }
+
   countByType(type: string): number {
     return this.mouvements.filter(m => m.type === type).length;
+  }
+
+  async actualiser(): Promise<void> {
+    const historique = await firstValueFrom(this.mouvementsService.getHistorique());
+    this.tousLesMouvements = historique;
+    this.appliquerFiltres();
+    if(this.filtreCategorie == undefined && this.filtreType == ''){
+      this.mouvements = historique;
+    }else if(this.filtreType != '' &&this.filtreCategorie != undefined){
+      this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie && h.type === this.filtreType);
     }else if (this.filtreCategorie != undefined){
       this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie );
     }else if (this.filtreType != ''){
@@ -66,6 +69,7 @@ export class HistoriqueComponent implements OnInit {
     }
     console.log(this.mouvements);
   }
+  
 
  getLabelCategorie(cat: number): string {
   const map: Record<number, string> = {
