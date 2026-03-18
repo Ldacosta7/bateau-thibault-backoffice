@@ -26,11 +26,12 @@ import { AuthInterceptor } from './core/services/interceptor';
     AppComponent,
     DashboardComponent,
     HistoriqueComponent,
-    ProduitsComponent,
+    ProduitsComponent    
   ],
   imports: [
     BrowserModule,
     NavbarComponent,
+    BrowserModule,
     CommonModule, 
     RouterModule,
     AppRoutingModule,
@@ -48,7 +49,7 @@ import { AuthInterceptor } from './core/services/interceptor';
     CommonModule,
     HttpClientModule
   ],
-  providers: [DecimalPipe,
+  providers: [DecimalPipe,DecimalPipe,
     {
       provide:  HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
