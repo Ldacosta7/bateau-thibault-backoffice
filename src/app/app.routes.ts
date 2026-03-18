@@ -7,7 +7,7 @@ import { ConnectionComponent } from './pages/connection/connection.component';
 import { InscriptionComponent } from './pages/inscription/inscription.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'produits', pathMatch: 'full' },
+  { path: '', redirectTo: 'connexion', pathMatch: 'full' },
   { path: 'produits', component: ProduitsComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'historique', component: HistoriqueComponent},

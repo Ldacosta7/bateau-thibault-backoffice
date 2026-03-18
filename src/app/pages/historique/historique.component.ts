@@ -41,9 +41,12 @@ export class HistoriqueComponent implements OnInit {
   ngOnInit(): void {
     this.actualiser();
   }
+  
 
   async actualiser(): Promise<void> {
     const historique = await firstValueFrom(this.mouvementsService.getHistorique());
+    this.tousLesMouvements = historique;
+    this.appliquerFiltres();
     if(this.filtreCategorie == undefined && this.filtreType == ''){
       this.mouvements = historique;
     }else if(this.filtreType != '' &&this.filtreCategorie != undefined){
@@ -54,6 +57,16 @@ export class HistoriqueComponent implements OnInit {
       this.mouvements = historique.filter(h => h.type === this.filtreType );
     }
     console.log(this.mouvements);
+  }
+  appliquerFiltres(): void {
+    this.mouvements = this.tousLesMouvements.filter(h => {
+      const matchCat  = !this.filtreCategorie || h.categorie === this.filtreCategorie;
+      const matchType = !this.filtreType      || h.type === this.filtreType;
+      return matchCat && matchType;
+    });
+  }
+  countByType(type: string): number {
+    return this.mouvements.filter(m => m.type === type).length;
   }
 
  getLabelCategorie(cat: number): string {
