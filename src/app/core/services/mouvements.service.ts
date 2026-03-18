@@ -70,7 +70,7 @@ export class MouvementsService {
 
   getHistoriqueFiltre(categorie?: number, type?: string): Observable<Mouvement[]> {
     return this.getHistorique().pipe(
-      map(historique => historique.filter(h => h.categorie === categorie && h.type === type))
+      map(historique => historique.filter(h => h.categorie === categorie && h.transaction === type))
     )
   }
 

@@ -5,7 +5,7 @@ export interface Mouvement {
   produitId: number;
   produitNom: string;
   categorie: number;
-  type: TypeMouvement;
+  transaction: TypeMouvement;
   quantite: number;
   prixUnitaire: number;
   total: number;

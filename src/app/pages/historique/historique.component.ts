@@ -45,13 +45,13 @@ export class HistoriqueComponent implements OnInit {
   appliquerFiltres(): void {
     this.mouvements = this.tousLesMouvements.filter(h => {
       const matchCat  = !this.filtreCategorie || h.categorie === this.filtreCategorie;
-      const matchType = !this.filtreType      || h.type === this.filtreType;
+      const matchType = !this.filtreType      || h.transaction === this.filtreType;
       return matchCat && matchType;
     });
   }
 
   countByType(type: string): number {
-    return this.mouvements.filter(m => m.type === type).length;
+    return this.mouvements.filter(m => m.transaction === type).length;
   }
 
   async actualiser(): Promise<void> {
@@ -61,11 +61,11 @@ export class HistoriqueComponent implements OnInit {
     if(this.filtreCategorie == undefined && this.filtreType == ''){
       this.mouvements = historique;
     }else if(this.filtreType != '' &&this.filtreCategorie != undefined){
-      this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie && h.type === this.filtreType);
+      this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie && h.transaction === this.filtreType);
     }else if (this.filtreCategorie != undefined){
       this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie );
     }else if (this.filtreType != ''){
-      this.mouvements = historique.filter(h => h.type === this.filtreType );
+      this.mouvements = historique.filter(h => h.transaction === this.filtreType );
     }
     console.log(this.mouvements);
   }

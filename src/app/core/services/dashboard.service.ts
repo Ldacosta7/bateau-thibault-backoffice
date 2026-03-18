@@ -155,10 +155,10 @@ getVentesVsInvendusParCategorie(annee: number): { categorie: number; ventes: num
   const categories = [0, 1, 2] as const;
   return categories.map(cat => {
 
-    const listeVentes = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.categorie === cat && v.type === 'retrait-par-vente')));
+    const listeVentes = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.categorie === cat && v.transaction === 'retrait-par-vente')));
     const ventes = Number(listeVentes.pipe(map(ventes => ventes.reduce((s, m) => s + m.quantite, 0))));
 
-    const listeInvendus = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.categorie === cat && v.type === 'retrait-par-invendus')));
+    const listeInvendus = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.categorie === cat && v.transaction === 'retrait-par-invendus')));
     const invendus = Number(listeVentes.pipe(map(ventes => ventes.reduce((s, m) => s + m.quantite, 0))));
 
     /*const ventes = this.mouvementsService.getMouvements()

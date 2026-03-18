@@ -96,14 +96,14 @@
           <ng-container matColumnDef="produit">
             <th mat-header-cell *matHeaderCellDef>Produit</th>
             <td mat-cell *matCellDef="let m">
-              <span class="produit-nom">{{ m.produitNom }}</span>
+              <span class="produit-nom">{{ m.produit.nom }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="categorie">
             <th mat-header-cell *matHeaderCellDef>Catégorie</th>
             <td mat-cell *matCellDef="let m">
-              <span class="categorie-badge">{{ getLabelCategorie(m.categorie) }}</span>
+              <span class="categorie-badge">{{ getLabelCategorie(m.produit.categorie) }}</span>
             </td>
           </ng-container>
 
@@ -111,7 +111,7 @@
             <th mat-header-cell *matHeaderCellDef>Type</th>
             <td mat-cell *matCellDef="let m">
               <span [class]="'badge-type ' + getClassType(m.type)">
-                {{ getLabelType(m.type) }}
+                {{ getLabelType(m.transaction) }}
               </span>
             </td>
           </ng-container>
@@ -119,7 +119,7 @@
           <ng-container matColumnDef="quantite">
             <th mat-header-cell *matHeaderCellDef>Quantité</th>
             <td mat-cell *matCellDef="let m">
-              <span class="quantite">{{ m.quantite }}</span>
+              <span class="quantite">{{ m.unite }}</span>
             </td>
           </ng-container>
 
@@ -134,7 +134,7 @@
             <th mat-header-cell *matHeaderCellDef>Total</th>
             <td mat-cell *matCellDef="let m">
               <span class="total" [class.total-positif]="m.type === 'retrait-par-vente'" [class.total-negatif]="m.type === 'ajout'">
-                {{ m.total > 0 ? (m.total | number:'1.2-2') + ' €' : '—' }}
+                {{ m.montant > 0 ? (m.montant | number:'1.2-2') + ' €' : '—' }}
               </span>
             </td>
           </ng-container>
