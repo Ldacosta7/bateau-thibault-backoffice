@@ -8,7 +8,7 @@ export class ProduitsService {
 
   constructor(private http: HttpClient) {}
 
-  token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczNzg0ODk0LCJpYXQiOjE3NzM3ODEyOTQsImp0aSI6IjNiZWY1ZTdlNDRlMTRjMDViYTJhMmI4NGFlYTA0NWY3IiwidXNlcl9pZCI6IjMifQ.4OTmdYZK301JQolzZIEoma3OXDq7tA4bMYy_j7eG3rE";
+  token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczODMxMjc5LCJpYXQiOjE3NzM4Mjc2NzksImp0aSI6IjcyODkyNjhmYjAzODRlYTg5NGE5ZDBhMzE5YTUzZTk4IiwidXNlcl9pZCI6IjMifQ.1uqS0AY4UoxmPmFLDbMfvqSHsQpXUYy02fEny9GsiC8";
 
   httpHeaders = new HttpHeaders({
     Authorization: `Bearer ${this.token}`

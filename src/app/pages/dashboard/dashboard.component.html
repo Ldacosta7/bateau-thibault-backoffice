@@ -110,17 +110,20 @@
   <div class="produits-grid">
 
     <mat-card>
-      <mat-card-header><mat-card-title>Top 3 produits vendus</mat-card-title></mat-card-header>
-      <mat-card-content>
-        @for (p of top3; track p.nom; let i = $index) {
-          <div class="top-ligne">
-            <span class="top-rang">{{ i + 1 }}</span>
-            <span class="top-nom">{{ p.nom }}</span>
-            <span class="top-total">{{ p.total }} unités</span>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
+  <mat-card-header>
+    <mat-card-title>Top 3 produits vendus</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    @for (p of (top3 | async); track p.nom; let i = $index) {
+      <div class="top-ligne">
+        <span class="top-rang">{{ i + 1 }}</span>
+        <span class="top-nom">{{ p.nom }}</span>
+        <span class="top-total">{{ p.total }} unités</span>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>
 
     <!--<mat-card [class.alerte-negative]="rupturesStock.length > 0">
       <mat-card-header><mat-card-title>Stocks faibles</mat-card-title></mat-card-header>

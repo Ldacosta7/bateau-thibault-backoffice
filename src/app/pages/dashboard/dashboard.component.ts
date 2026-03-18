@@ -27,7 +27,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   margeAnnuelle = 0;
   impotPrevisionnel = 0;
   valeurStock : Promise<number> | undefined;
-  top3: { nom: string; total: number }[] = [];
+  top3: Promise<{ nom: string; total: number }[]> | undefined;
   rupturesStock: Promise<{ nom: string; stock: number; }[]> | undefined ;
   tauxInvendus: { categorie: number; taux: number }[] = [];
   trimestres: KpiTrimestre[] = [];

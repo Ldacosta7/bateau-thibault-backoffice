@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MouvementsService } from './mouvements.service';
 import { ProduitsService } from './produits.service';
 import { Mouvement } from '../models/mouvement.model';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map, Observable, reduce } from 'rxjs';
 
 export interface KpiPeriode {
   label: string;
@@ -26,24 +26,23 @@ export class DashboardService {
     private produitsService: ProduitsService
   ) {}
 
-  private getVentes(): Mouvement[] {
-    return this.mouvementsService.getMouvements()
-      .filter(m => m.type === 'retrait-par-vente');
+  private getVentes(): Observable<Mouvement[]> {
+    return this.mouvementsService.getHistoriqueFiltre(undefined, 'retrait-par-vente');
   }
 
-  private getAchats(): Mouvement[] {
-    return this.mouvementsService.getMouvements()
-      .filter(m => m.type === 'ajout');
+  private getAchats(): Observable<Mouvement[]> {
+    return this.mouvementsService.getHistoriqueFiltre(undefined, 'ajout');
   }
 
   // CA par période
   getCAParMois(annee: number): KpiPeriode[] {
     const mois = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jui', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
     return mois.map((label, i) => {
-      const ventes = this.getVentes().filter(m => m.date.getFullYear() === annee && m.date.getMonth() === i);
-      const achats = this.getAchats().filter(m => m.date.getFullYear() === annee && m.date.getMonth() === i);
-      const ca = ventes.reduce((s, m) => s + m.total, 0);
-      const achat = achats.reduce((s, m) => s + m.total, 0);
+      const ventes = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.date.getMonth() === i)));
+      const achats = this.getAchats().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.date.getMonth() === i)));
+      const ca = Number(ventes.pipe(map(ventes => ventes.reduce((s, m) => s + m.total, 0))));
+      const achat = Number(achats.pipe(map(achat => achat.reduce((s, m) => s + m.total, 0))));
+
       return { label, chiffreAffaires: ca, achats: achat, marge: ca - achat };
     });
   }
@@ -57,10 +56,10 @@ export class DashboardService {
     ];
 
     const resultats = trimestres.map((t, i) => {
-      const ventes = this.getVentes().filter(m => m.date.getFullYear() === annee && t.mois.includes(m.date.getMonth()));
-      const achats = this.getAchats().filter(m => m.date.getFullYear() === annee && t.mois.includes(m.date.getMonth()));
-      const ca = ventes.reduce((s, m) => s + m.total, 0);
-      const achat = achats.reduce((s, m) => s + m.total, 0);
+      const ventes = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.date.getMonth() === i)));
+      const achats = this.getAchats().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.date.getMonth() === i)));
+      const ca = Number(ventes.pipe(map(ventes => ventes.reduce((s, m) => s + m.total, 0))));
+      const achat = Number(achats.pipe(map(achat => achat.reduce((s, m) => s + m.total, 0))));
       const marge = ca - achat;
       return { label: t.label, trimestre: i + 1, annee, chiffreAffaires: ca, achats: achat, marge, alerteNegative: false, confettis: false };
     });
@@ -79,17 +78,15 @@ export class DashboardService {
   }
 
   getCATotal(annee: number): number {
-    return this.getVentes()
-      .filter(m => m.date.getFullYear() === annee)
-      .reduce((s, m) => s + m.total, 0);
+    const ventes = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee)));
+    return Number(ventes.pipe(map(ventes => ventes.reduce((s, m) => s + m.total, 0))));
   }
 
   getMargeAnnuelle(annee: number): number {
     const ca = this.getCATotal(annee);
-    const achats = this.getAchats()
-      .filter(m => m.date.getFullYear() === annee)
-      .reduce((s, m) => s + m.total, 0);
-    return ca - achats;
+    const achats = this.getAchats().pipe(map(achat => achat.filter(a => a.date.getFullYear() === annee)));
+    
+    return ca - Number(achats.pipe(map(achat => achat.reduce((s, m) => s + m.total, 0))));;
   }
 
   getImpotPrevisionnel(annee: number): number {
@@ -104,12 +101,19 @@ export class DashboardService {
     return produits.reduce((s, p) => s + p.prix * p.stock, 0);
   }
 
-  getTop3Vendus(): { nom: string; total: number }[] {
-    const map = new Map<string, number>();
-    this.getVentes().forEach(m => {
-      map.set(m.produitNom, (map.get(m.produitNom) || 0) + m.quantite);
+  async getTop3Vendus(): Promise<{ nom: string; total: number }[]> {
+    const ventes = await firstValueFrom(this.getVentes());
+
+    const mapProduits = new Map<string, number>();
+
+    ventes.forEach(v => {
+      mapProduits.set(
+        v.produitNom,
+        (mapProduits.get(v.produitNom) || 0) + v.quantite
+      );
     });
-    return Array.from(map.entries())
+
+    return Array.from(mapProduits.entries())
       .map(([nom, total]) => ({ nom, total }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 3);
@@ -127,12 +131,12 @@ export class DashboardService {
   getTauxInvendusParCategorie(): { categorie: number; taux: number }[] {
     const categories = [0, 1, 2] as const;
     return categories.map(cat => {
-      const invendus = this.mouvementsService.getMouvements()
-        .filter(m => m.categorie === cat && m.type === 'retrait-par-invendus')
-        .reduce((s, m) => s + m.quantite, 0);
-      const total = this.mouvementsService.getMouvements()
-        .filter(m => m.categorie === cat)
-        .reduce((s, m) => s + m.quantite, 0);
+      const listeInvendus = this.mouvementsService.getHistoriqueFiltre(cat, 'retrait-par-invendus');
+      const invendus = Number(listeInvendus.pipe(map(invendu => invendu.reduce((s, m) => s + m.quantite, 0))));
+
+      const listeTotal = this.mouvementsService.getHistoriqueFiltre(cat);
+      const total = Number(listeTotal.pipe(map(total => total.reduce((s, m) => s + m.quantite, 0))));
+
       return { categorie: cat, taux: total > 0 ? Math.round((invendus / total) * 100) : 0 };
     });
   }
@@ -140,9 +144,9 @@ export class DashboardService {
   getCAParCategorie(annee: number): { categorie: number; ca: number }[] {
   const categories = [0, 1, 2] as const;
   return categories.map(cat => {
-    const ca = this.getVentes()
-      .filter(m => m.date.getFullYear() === annee && m.categorie === cat)
-      .reduce((s, m) => s + m.total, 0);
+    const listeCa = this.mouvementsService.getHistoriqueFiltre(cat).pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee)));
+    const ca = Number(listeCa.pipe(map(total => total.reduce((s, m) => s + m.quantite, 0))));
+
     return { categorie: cat, ca };
   });
 }
@@ -150,12 +154,19 @@ export class DashboardService {
 getVentesVsInvendusParCategorie(annee: number): { categorie: number; ventes: number; invendus: number }[] {
   const categories = [0, 1, 2] as const;
   return categories.map(cat => {
-    const ventes = this.mouvementsService.getMouvements()
+
+    const listeVentes = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.categorie === cat && v.type === 'retrait-par-vente')));
+    const ventes = Number(listeVentes.pipe(map(ventes => ventes.reduce((s, m) => s + m.quantite, 0))));
+
+    const listeInvendus = this.getVentes().pipe(map(ventes => ventes.filter(v => v.date.getFullYear() === annee && v.categorie === cat && v.type === 'retrait-par-invendus')));
+    const invendus = Number(listeVentes.pipe(map(ventes => ventes.reduce((s, m) => s + m.quantite, 0))));
+
+    /*const ventes = this.mouvementsService.getMouvements()
       .filter(m => m.date.getFullYear() === annee && m.categorie === cat && m.type === 'retrait-par-vente')
       .reduce((s, m) => s + m.quantite, 0);
     const invendus = this.mouvementsService.getMouvements()
       .filter(m => m.date.getFullYear() === annee && m.categorie === cat && m.type === 'retrait-par-invendus')
-      .reduce((s, m) => s + m.quantite, 0);
+      .reduce((s, m) => s + m.quantite, 0);*/
     return { categorie: cat, ventes, invendus };
   });
 }

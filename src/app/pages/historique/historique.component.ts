@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { Mouvement, TypeMouvement } from '../../core/models/mouvement.model';
 import { MouvementsService } from '../../core/services/mouvements.service';
+import { firstValueFrom, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-historique',
@@ -43,11 +44,10 @@ export class HistoriqueComponent implements OnInit {
     this.actualiser();
   }
 
-  actualiser(): void {
-    this.mouvements = this.mouvementsService.getMouvementsFiltres(
-      this.filtreCategorie || undefined,
-      this.filtreType || undefined
-    );
+  async actualiser(): Promise<void> {
+    const historique = await firstValueFrom(this.mouvementsService.getHistorique());
+
+    this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie && h.type === this.filtreType);
   }
 
   getLabelCategorie(cat: string): string {
