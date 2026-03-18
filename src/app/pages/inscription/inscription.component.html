@@ -1,0 +1,153 @@
+<!-- inscription.component.html -->
+<div class="ocean-bg">
+  <!-- Animated waves -->
+  <div class="waves-container">
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+      <defs>
+        <path id="wave-reg" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/>
+      </defs>
+      <g class="wave-parallax">
+        <use href="#wave-reg" x="48" y="0" class="wave wave-1"/>
+        <use href="#wave-reg" x="48" y="3" class="wave wave-2"/>
+        <use href="#wave-reg" x="48" y="5" class="wave wave-3"/>
+        <use href="#wave-reg" x="48" y="7" class="wave wave-4"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Floating bubbles -->
+  <div class="bubbles">
+    <span class="bubble" *ngFor="let b of bubbles"
+      [style.left]="b.left"
+      [style.animationDuration]="b.duration"
+      [style.width]="b.size"
+      [style.height]="b.size"
+      [style.animationDelay]="b.delay">
+    </span>
+  </div>
+
+  <!-- Register Card -->
+  <div class="card-wrapper">
+    <div class="register-card" [class.floating]="isFloating" (click)="toggleFloat()">
+      <!-- Brand -->
+      <div class="brand">
+        <div class="fish-icon">
+          <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 32C50 32 38 16 20 20C14 21.5 8 26 8 32C8 38 14 42.5 20 44C38 48 50 32 50 32Z" fill="#0ea5e9"/>
+            <path d="M50 32C46 28 56 20 60 24C62 26 62 30 60 34C56 38 46 36 50 32Z" fill="#0ea5e9"/>
+            <circle cx="22" cy="28" r="2.5" fill="white"/>
+            <circle cx="22" cy="28" r="1" fill="#0c4a6e"/>
+          </svg>
+        </div>
+        <h1 class="brand-name">AquaMer</h1>
+        <p class="brand-tagline">Poissonnerie & Fruits de mer</p>
+      </div>
+
+      <h2 class="form-title">Créer un compte</h2>
+
+      <form class="register-form" (ngSubmit)="onSubmit()" #registerForm="ngForm">
+
+        <!-- Username -->
+        <div class="row-fields">
+          <div class="field-group">
+            <label class="field-label" for="username">Nom d'utilisateur</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input type="text" id="username" name="username" [(ngModel)]="registerData.username"
+                required placeholder="Jean" class="form-input" autocomplete="given-name"/>
+            </div>
+          </div>
+        </div>
+        <!-- Email -->
+        <div class="field-group">
+          <label class="field-label" for="email">Adresse email</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </span>
+            <input type="email" id="email" name="email" [(ngModel)]="registerData.email"
+              required placeholder="votre@email.com" class="form-input" autocomplete="email"/>
+          </div>
+        </div>
+        <!-- Mot de passe -->
+        <div class="field-group">
+          <label class="field-label" for="password">Mot de passe</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+              [(ngModel)]="registerData.password" required placeholder="••••••••"
+              class="form-input" (input)="checkPasswordStrength()" autocomplete="new-password"/>
+            <button type="button" class="toggle-pw" (click)="togglePassword()">
+              <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <div class="pw-strength" *ngIf="registerData.password">
+            <div class="pw-bars">
+              <div class="pw-bar" [class.active]="strength >= 1" [class.weak]="strength === 1" [class.medium]="strength === 2" [class.strong]="strength >= 3"></div>
+              <div class="pw-bar" [class.active]="strength >= 2" [class.medium]="strength === 2" [class.strong]="strength >= 3"></div>
+              <div class="pw-bar" [class.active]="strength >= 3" [class.strong]="strength >= 3"></div>
+              <div class="pw-bar" [class.active]="strength >= 4" [class.strong]="strength >= 4"></div>
+            </div>
+            <span class="pw-label" [ngClass]="strengthLabel.class">{{ strengthLabel.text }}</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="confirmPassword">Confirmer le mot de passe</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </span>
+            <input [type]="showConfirm ? 'text' : 'password'" id="confirmPassword" name="confirmPassword"
+              [(ngModel)]="registerData.confirmPassword" required placeholder="••••••••"
+              class="form-input" [class.mismatch]="passwordMismatch" autocomplete="new-password"/>
+            <button type="button" class="toggle-pw" (click)="showConfirm = !showConfirm">
+              <svg *ngIf="!showConfirm" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showConfirm" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <span class="error-msg" *ngIf="passwordMismatch">Les mots de passe ne correspondent pas</span>
+        </div>
+        <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isLoading || passwordMismatch">
+          <span *ngIf="!isLoading">Créer mon compte</span>
+          <span *ngIf="isLoading" class="loader"></span>
+        </button>
+
+        <div class="divider"><span>ou</span></div>
+
+        <p class="login-link">
+          Déjà un compte ?
+          <a routerLink="/connexion">Se connecter</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

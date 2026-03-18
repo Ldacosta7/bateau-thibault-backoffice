@@ -1,79 +1,164 @@
-<h1>Historique des mouvements</h1>
+<div class="historique-page">
 
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <span class="header-eyebrow">Back-office</span>
+        <h1 class="page-title">Historique des mouvements</h1>
+      </div>
+      <div class="header-badge">
+        <span class="nb-resultats">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ mouvements.length }} mouvement(s)
+        </span>
+      </div>
+    </div>
+    <div class="header-wave">
+      <svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" fill="#f0f6fa"/>
+      </svg>
+    </div>
+  </header>
 
-<div class="filtres">
-  <!-- Catégorie Filter -->
-  <mat-form-field appearance="outline">
-    <mat-label>Catégorie</mat-label>
-    <mat-select [(ngModel)]="filtreCategorie" (ngModelChange)="actualiser()">
-      <mat-option *ngFor="let c of categories" [value]="c.valeur">
-        {{ c.label }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  <main class="page-body">
 
-  <!-- Type de mouvement Filter -->
-  <mat-form-field appearance="outline">
-    <mat-label>Type de mouvement</mat-label>
-    <mat-select [(ngModel)]="filtreType" (ngModelChange)="actualiser()">
-      <mat-option *ngFor="let t of types" [value]="t.valeur">
-        {{ t.label }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+    <div class="filtres-card">
+      <div class="filtres-label">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filtres
+      </div>
+      <div class="filtres-row">
 
-  <!-- Nombre de résultats -->
-  <span class="nb-resultats">{{ mouvements.length }} mouvement(s)</span>
-</div>
+        <div class="filter-group">
+          <label class="filter-label">Catégorie</label>
+          <div class="select-wrapper">
+            <select class="ocean-select" [(ngModel)]="filtreCategorie" (ngModelChange)="actualiser()">
+              @for (c of categories; track c.valeur) {
+                <option [value]="c.valeur">{{ c.label }}</option>
+              }
+            </select>
+            <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
 
-<!-- Table des mouvements -->
-<table mat-table [dataSource]="mouvements" class="mat-elevation-z2">
+        <div class="filter-group">
+          <label class="filter-label">Type de mouvement</label>
+          <div class="select-wrapper">
+            <select class="ocean-select" [(ngModel)]="filtreType" (ngModelChange)="actualiser()">
+              @for (t of types; track t.valeur) {
+                <option [value]="t.valeur">{{ t.label }}</option>
+              }
+            </select>
+            <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
 
-  <ng-container matColumnDef="date">
-    <th mat-header-cell *matHeaderCellDef>Date</th>
-    <td mat-cell *matCellDef="let m">{{ m.date | date:'dd/MM/yyyy' }}</td>
-  </ng-container>
+        <div class="filtres-stats">
+          <span class="stat-pill pill-ajout">
+            <span class="pill-dot"></span>
+            {{ countByType('ajout') }} Ajouts
+          </span>
+          <span class="stat-pill pill-vente">
+            <span class="pill-dot"></span>
+            {{ countByType('retrait-par-vente') }} Ventes
+          </span>
+          <span class="stat-pill pill-invendus">
+            <span class="pill-dot"></span>
+            {{ countByType('retrait-par-invendus') }} Invendus
+          </span>
+        </div>
 
-  <ng-container matColumnDef="produit">
-    <th mat-header-cell *matHeaderCellDef>Produit</th>
-    <td mat-cell *matCellDef="let m">{{ m.produit.nom }}</td>
-  </ng-container>
+      </div>
+    </div>
 
-  <ng-container matColumnDef="categorie">
-    <th mat-header-cell *matHeaderCellDef>Catégorie</th>
-    <td mat-cell *matCellDef="let m">{{ getLabelCategorie(m.produit.categorie) }}</td>
-  </ng-container>
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="mouvements" class="ocean-table">
 
-  <ng-container matColumnDef="type">
-    <th mat-header-cell *matHeaderCellDef>Type</th>
-    <td mat-cell *matCellDef="let m">
-      <span [class]="'badge-type ' + getClassType(m.transaction)">
-        {{ getLabelType(m.type) }}
-      </span>
-    </td>
-  </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let m">
+              <div class="date-cell">
+                <span class="date-day">{{ m.date | date:'dd/MM/yyyy' }}</span>
+                <span class="date-time">{{ m.date | date:'HH:mm' }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-  <ng-container matColumnDef="quantite">
-    <th mat-header-cell *matHeaderCellDef>Quantité</th>
-    <td mat-cell *matCellDef="let m">{{ m.unite }}</td>
-  </ng-container>
+          <ng-container matColumnDef="produit">
+            <th mat-header-cell *matHeaderCellDef>Produit</th>
+            <td mat-cell *matCellDef="let m">
+              <span class="produit-nom">{{ m.produitNom }}</span>
+            </td>
+          </ng-container>
 
-  <ng-container matColumnDef="prixUnitaire">
-    <th mat-header-cell *matHeaderCellDef>Prix unitaire</th>
-    <td mat-cell *matCellDef="let m">{{ m.prixUnitaire > 0 ? (m.prixUnitaire + ' €') : '—' }}</td>
-  </ng-container>
+          <ng-container matColumnDef="categorie">
+            <th mat-header-cell *matHeaderCellDef>Catégorie</th>
+            <td mat-cell *matCellDef="let m">
+              <span class="categorie-badge">{{ getLabelCategorie(m.categorie) }}</span>
+            </td>
+          </ng-container>
 
-  <ng-container matColumnDef="total">
-    <th mat-header-cell *matHeaderCellDef>Total</th>
-    <td mat-cell *matCellDef="let m" class="total">{{ m.montant > 0 ? (m.montant + ' €') : '—' }}</td>
-  </ng-container>
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let m">
+              <span [class]="'badge-type ' + getClassType(m.type)">
+                {{ getLabelType(m.type) }}
+              </span>
+            </td>
+          </ng-container>
 
-  <!-- Header and Row Definitions -->
-  <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
-  <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
-</table>
+          <ng-container matColumnDef="quantite">
+            <th mat-header-cell *matHeaderCellDef>Quantité</th>
+            <td mat-cell *matCellDef="let m">
+              <span class="quantite">{{ m.quantite }}</span>
+            </td>
+          </ng-container>
 
-<!-- Empty State -->
-<div class="vide" *ngIf="mouvements.length === 0">
-  Aucun mouvement enregistré pour le moment.
+          <ng-container matColumnDef="prixUnitaire">
+            <th mat-header-cell *matHeaderCellDef>Prix unitaire</th>
+            <td mat-cell *matCellDef="let m">
+              <span class="prix">{{ m.prixUnitaire > 0 ? (m.prixUnitaire | number:'1.2-2') + ' €' : '—' }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef>Total</th>
+            <td mat-cell *matCellDef="let m">
+              <span class="total" [class.total-positif]="m.type === 'retrait-par-vente'" [class.total-negatif]="m.type === 'ajout'">
+                {{ m.total > 0 ? (m.total | number:'1.2-2') + ' €' : '—' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
+
+        </table>
+      </div>
+
+      @if (mouvements.length === 0) {
+        <div class="vide">
+          <div class="vide-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <p class="vide-titre">Aucun mouvement trouvé</p>
+          <p class="vide-sous">Essayez de modifier vos filtres</p>
+        </div>
+      }
+    </div>
+
+  </main>
 </div>

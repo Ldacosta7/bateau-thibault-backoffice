@@ -1,7 +1,75 @@
-<mat-toolbar color="primary">
-  <span>Bateau de Thibault</span>
-  <span class="spacer"></span>
-  <a mat-button routerLink="/produits" routerLinkActive="active-link">Produits</a>
-  <a mat-button routerLink="/historique" routerLinkActive="active-link">Historique</a>
-  <a mat-button routerLink="/dashboard" routerLinkActive="active-link">Dashboard</a>
-</mat-toolbar>
+<nav class="navbar">
+
+  <div class="wave-bg" aria-hidden="true">
+    <div class="wave wave-a"></div>
+    <div class="wave wave-b"></div>
+    <div class="wave wave-c"></div>
+  </div>
+
+  <div class="navbar-inner">
+
+    <a class="brand" routerLink="/produits">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 32C50 32 38 16 20 20C14 21.5 8 26 8 32C8 38 14 42.5 20 44C38 48 50 32 50 32Z" fill="white"/>
+          <path d="M50 32C46 28 56 20 60 24C62 26 62 30 60 34C56 38 46 36 50 32Z" fill="white"/>
+          <circle cx="22" cy="28" r="2.5" fill="rgba(2,13,24,0.4)"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Bateau de Thibault</span>
+        <span class="brand-sub">Poissonnerie</span>
+      </div>
+    </a>
+
+    <button class="burger" (click)="toggleMenu()" [class.open]="menuOpen" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-panel" [class.nav-panel--open]="menuOpen">
+
+      <div class="nav-links">
+        <a class="nav-link" routerLink="/produits"   routerLinkActive="nav-link--active" (click)="closeMenu()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span>Produits</span>
+        </a>
+
+        <a class="nav-link" routerLink="/historique" routerLinkActive="nav-link--active" (click)="closeMenu()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Historique</span>
+        </a>
+
+        <a class="nav-link" routerLink="/dashboard"  routerLinkActive="nav-link--active" (click)="closeMenu()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+      </div>
+
+      <div class="nav-separator"></div>
+
+      <button class="btn-logout" (click)="logout()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Déconnexion</span>
+      </button>
+
+    </div>
+  </div>
+</nav>
+
+<div class="overlay" [class.overlay--visible]="menuOpen" (click)="closeMenu()"></div>
