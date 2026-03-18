@@ -2,12 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
-import { MatChipsModule } from '@angular/material/chips';
 import { Mouvement, TypeMouvement } from '../../core/models/mouvement.model';
 import { MouvementsService } from '../../core/services/mouvements.service';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-historique',
@@ -19,7 +16,7 @@ export class HistoriqueComponent implements OnInit {
 
   colonnes = ['date', 'produit', 'categorie', 'type', 'quantite', 'prixUnitaire', 'total'];
 
-  filtreCategorie = 0;
+  filtreCategorie: any = '';
   filtreType = '';
 
   categories = [
@@ -37,6 +34,7 @@ export class HistoriqueComponent implements OnInit {
   ];
 
   mouvements: Mouvement[] = [];
+  private tousLesMouvements: Mouvement[] = [];
 
   constructor(private mouvementsService: MouvementsService) {}
 
@@ -46,8 +44,19 @@ export class HistoriqueComponent implements OnInit {
 
   async actualiser(): Promise<void> {
     const historique = await firstValueFrom(this.mouvementsService.getHistorique());
+    this.tousLesMouvements = historique;
+    this.appliquerFiltres();
+  }
 
-    this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie && h.type === this.filtreType);
+  appliquerFiltres(): void {
+    this.mouvements = this.tousLesMouvements.filter(h => {
+      const matchCat  = !this.filtreCategorie || h.categorie === this.filtreCategorie;
+      const matchType = !this.filtreType      || h.type === this.filtreType;
+      return matchCat && matchType;
+    });
+  }
+  countByType(type: string): number {
+    return this.mouvements.filter(m => m.type === type).length;
   }
 
   getLabelCategorie(cat: string): string {

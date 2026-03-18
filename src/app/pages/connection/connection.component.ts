@@ -6,9 +6,9 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 interface Bubble {
-  left: string;
+  left:     string;
   duration: string;
-  size: string;
+  size:     string;
 }
 
 @Component({
@@ -21,14 +21,14 @@ interface Bubble {
 export class ConnectionComponent implements OnInit {
 
   loginData = {
-    email: '',
+    email:    '',
     password: '',
     remember: false
   };
 
   showPassword = false;
-  isLoading= false;
-  isFloating= true;
+  isLoading    = false;
+  isFloating   = true;
   errorMessage = '';
 
   bubbles: Bubble[] = [];
@@ -50,19 +50,19 @@ export class ConnectionComponent implements OnInit {
     for (let i = 0; i < 18; i++) {
       const size = Math.random() * 22 + 6;
       this.bubbles.push({
-        left:`${Math.random() * 100}%`,
+        left:     `${Math.random() * 100}%`,
         duration: `${Math.random() * 12 + 8}s`,
-        size: `${size}px`
+        size:     `${size}px`
       });
     }
   }
 
-  toggleFloat(): void{ this.isFloating   = false; }
-  togglePassword(): void{ this.showPassword = !this.showPassword; }
+  toggleFloat(): void    { this.isFloating   = false; }
+  togglePassword(): void { this.showPassword = !this.showPassword; }
 
   onSubmit(): void {
     if (this.isLoading) return;
-    this.isLoading= true;
+    this.isLoading    = true;
     this.errorMessage = '';
 
     this.authService.login(this.loginData.email, this.loginData.password).subscribe({

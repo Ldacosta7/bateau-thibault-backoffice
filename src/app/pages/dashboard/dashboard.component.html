@@ -1,159 +1,179 @@
 <div class="dashboard">
 
-  <div class="dashboard-header">
-    <h1>Dashboard</h1>
-    <mat-form-field appearance="outline" class="select-annee">
-      <mat-label>Année</mat-label>
-      <mat-select [(ngModel)]="anneeSelectionnee" (ngModelChange)="charger()">
-        @for (a of annees; track a) {
-          <mat-option [value]="a">{{ a }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
+  <header class="dashboard-header">
+    <div class="header-top">
+      <div class="header-left">
+        <span class="header-eyebrow">Vue d'ensemble</span>
+        <h1 class="header-title">Dashboard</h1>
+      </div>
 
-  @if (confettisActifs) {
-    <div class="confettis-banner">Bénéfice exceptionnel ce trimestre !</div>
-  }
+      <div class="select-annee-wrapper">
+        <label>Année</label>
+        <select [(ngModel)]="anneeSelectionnee" (ngModelChange)="charger()">
+          @for (a of annees; track a) {
+            <option [value]="a">{{ a }}</option>
+          }
+        </select>
+      </div>
+    </div>
 
-  <!-- KPIs FINANCIERS -->
-  <div class="kpi-grid">
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Chiffre d'affaires annuel</div>
-        <div class="kpi-value">{{ caTotal | number:'1.0-0' }} €</div>
-      </mat-card-content>
-    </mat-card>
+    <div class="header-wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" fill="var(--bg)"/>
+      </svg>
+    </div>
+  </header>
 
-    <mat-card class="kpi-card" [class.kpi-negatif]="margeAnnuelle < 0" [class.kpi-positif]="margeAnnuelle > 0">
-      <mat-card-content>
-        <div class="kpi-label">Marge annuelle</div>
-        <div class="kpi-value">{{ margeAnnuelle | number:'1.0-0' }} €</div>
-      </mat-card-content>
-    </mat-card>
+  <div class="page-body">
 
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Impôt prévisionnel (30%)</div>
-        <div class="kpi-value">{{ impotPrevisionnel | number:'1.0-0' }} €</div>
-      </mat-card-content>
-    </mat-card>
-<!--
-    <mat-card class="kpi-card">
-      <mat-card-content>
-        <div class="kpi-label">Valeur du stock</div>
-        <div class="kpi-value">{{ valeurStock | number:'1.0-0' }} €</div>
-      </mat-card-content>
-    </mat-card>
-  </div>
--->
-  <!-- GRAPHIQUES -->
-  <div class="graphiques-grid">
-
-    <mat-card class="graphique-card large">
-      <mat-card-header>
-        <mat-card-title>CA et Marge par mois</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <canvas #barChart></canvas>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="graphique-card">
-      <mat-card-header>
-        <mat-card-title>Répartition du CA par catégorie</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <canvas #pieChart></canvas>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="graphique-card">
-      <mat-card-header>
-        <mat-card-title>Ventes vs Invendus par catégorie</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <canvas #groupedChart></canvas>
-      </mat-card-content>
-    </mat-card>
-
-  </div>
-
-  <!-- TRIMESTRES -->
-  <h2>Détail par trimestre</h2>
-  <div class="trimestres-grid">
-    @for (t of trimestres; track t.trimestre) {
-      <mat-card class="trimestre-card"
-        [class.alerte-negative]="t.alerteNegative"
-        [class.confettis-card]="t.confettis">
-        <mat-card-content>
-          <div class="trimestre-titre">
-            {{ t.label }}
-            @if (t.alerteNegative) {
-              <span class="badge-alerte">Marge négative</span>
-            }
-            @if (t.confettis) {
-              <span class="badge-confettis">Exceptionnel</span>
-            }
-          </div>
-          <div class="trimestre-ligne">CA : <strong>{{ t.chiffreAffaires | number:'1.0-0' }} €</strong></div>
-          <div class="trimestre-ligne">Achats : <strong>{{ t.achats | number:'1.0-0' }} €</strong></div>
-          <div class="trimestre-ligne" [class.negatif]="t.marge < 0">
-            Marge : <strong>{{ t.marge | number:'1.0-0' }} €</strong>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    }
-  </div>
-
-  <!-- KPIs PRODUITS -->
-  <div class="produits-grid">
-
-    <mat-card>
-  <mat-card-header>
-    <mat-card-title>Top 3 produits vendus</mat-card-title>
-  </mat-card-header>
-
-  <mat-card-content>
-    @for (p of (top3 | async); track p.nom; let i = $index) {
-      <div class="top-ligne">
-        <span class="top-rang">{{ i + 1 }}</span>
-        <span class="top-nom">{{ p.nom }}</span>
-        <span class="top-total">{{ p.total }} unités</span>
+    @if (confettisActifs) {
+      <div class="confettis-banner">
+        🎉 Bénéfice exceptionnel ce trimestre !
       </div>
     }
-  </mat-card-content>
-</mat-card>
 
-    <!--<mat-card [class.alerte-negative]="rupturesStock.length > 0">
-      <mat-card-header><mat-card-title>Stocks faibles</mat-card-title></mat-card-header>
-      <mat-card-content>
-        @if (rupturesStock.length === 0) {
-          <div class="aucun">Aucun produit en rupture</div>
-        }
-        @for (p of rupturesStock; track p.nom) {
-          <div class="rupture-ligne">
-            <span>{{ p.nom }}</span>
-            <span class="stock-critique">{{ p.stock }} restants</span>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>-->
+    <div class="kpi-grid">
 
-    <mat-card>
-      <mat-card-header><mat-card-title>Taux d'invendus</mat-card-title></mat-card-header>
-      <mat-card-content>
-        @for (t of tauxInvendus; track t.categorie) {
-          <div class="invendus-ligne">
-            <!--<span class="invendus-label">{{ getLabelCategorie(t.categorie) }}</span>-->
-            <div class="barre-conteneur">
-              <div class="barre-remplissage" [style.width.%]="t.taux"></div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-blue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span class="kpi-label">Chiffre d'affaires</span>
+        <span class="kpi-value">{{ caTotal | number:'1.0-0' }} €</span>
+      </div>
+
+      <div class="kpi-card" [class.kpi-negatif]="margeAnnuelle < 0" [class.kpi-positif]="margeAnnuelle > 0">
+        <div class="kpi-icon kpi-icon-green">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+          </svg>
+        </div>
+        <span class="kpi-label">Marge annuelle</span>
+        <span class="kpi-value">{{ margeAnnuelle | number:'1.0-0' }} €</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-amber">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <span class="kpi-label">Impôt prévisionnel (30%)</span>
+        <span class="kpi-value">{{ impotPrevisionnel | number:'1.0-0' }} €</span>
+      </div>
+
+    </div>
+
+    <div class="graphiques-grid">
+
+      <div class="card graphique-card large">
+        <div class="card-header">
+          <p class="card-title">CA & Marge par mois</p>
+        </div>
+        <div class="card-body">
+          <canvas #barChart></canvas>
+        </div>
+      </div>
+
+      <div class="card graphique-card">
+        <div class="card-header">
+          <p class="card-title">Répartition du CA</p>
+        </div>
+        <div class="card-body">
+          <canvas #pieChart></canvas>
+        </div>
+      </div>
+
+      <div class="card graphique-card">
+        <div class="card-header">
+          <p class="card-title">Ventes vs Invendus</p>
+        </div>
+        <div class="card-body">
+          <canvas #groupedChart></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <h2 class="section-heading">Détail par trimestre</h2>
+      <div class="trimestres-grid">
+        @for (t of trimestres; track t.trimestre) {
+          <div class="card trimestre-card"
+            [class.alerte-negative]="t.alerteNegative"
+            [class.confettis-card]="t.confettis">
+
+            <div class="trimestre-titre">
+              {{ t.label }}
+              @if (t.alerteNegative) {
+                <span class="badge-alerte">Marge négative</span>
+              }
+              @if (t.confettis) {
+                <span class="badge-confettis">⭐ Exceptionnel</span>
+              }
             </div>
-            <span class="taux-valeur">{{ t.taux }}%</span>
+
+            <div class="trimestre-divider"></div>
+
+            <div class="trimestre-ligne">
+              <span>Chiffre d'affaires</span>
+              <strong>{{ t.chiffreAffaires | number:'1.0-0' }} €</strong>
+            </div>
+            <div class="trimestre-ligne">
+              <span>Achats</span>
+              <strong>{{ t.achats | number:'1.0-0' }} €</strong>
+            </div>
+            <div class="trimestre-ligne" [class.negatif]="t.marge < 0">
+              <span>Marge</span>
+              <strong>{{ t.marge | number:'1.0-0' }} €</strong>
+            </div>
+
           </div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
+
+    <div class="produits-grid">
+
+      <div class="card">
+        <div class="card-header">
+          <p class="card-title">Top 3 produits vendus</p>
+        </div>
+        <div class="card-body">
+          @for (p of (top3 | async); track p.nom; let i = $index) {
+            <div class="top-ligne">
+              <span class="top-rang" [class.rang-1]="i===0" [class.rang-2]="i===1" [class.rang-3]="i===2">
+                {{ i + 1 }}
+              </span>
+              <span class="top-nom">{{ p.nom }}</span>
+              <span class="top-total">{{ p.total }} unités</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <p class="card-title">📊 Taux d'invendus</p>
+        </div>
+        <div class="card-body">
+          @for (t of tauxInvendus; track t.categorie) {
+            <div class="invendus-ligne">
+              <span class="invendus-label">{{ getLabelCategorie(t.categorie) }}</span>
+              <div class="barre-conteneur">
+                <div class="barre-remplissage" [style.width.%]="t.taux"></div>
+              </div>
+              <span class="taux-valeur">{{ t.taux }}%</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
 
   </div>
 </div>

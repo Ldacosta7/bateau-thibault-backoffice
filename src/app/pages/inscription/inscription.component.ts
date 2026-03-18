@@ -29,10 +29,9 @@ export class InscriptionComponent implements OnInit {
   registerData = {
     username:'',
     email:'',
-    telephone:'',
     password:'',
-    confirmPassword: '',
-    cgu:false
+    confirmPassword:'',
+    cgu:             false
   };
 
   showPassword = false;
@@ -103,7 +102,7 @@ export class InscriptionComponent implements OnInit {
     this.isLoading    = true;
     this.errorMessage = '';
 
-    const username = `${this.registerData.username}`.trim();
+    const username = this.registerData.username.trim();
 
     this.authService.register(username, this.registerData.email, this.registerData.password).subscribe({
       next: () => {
