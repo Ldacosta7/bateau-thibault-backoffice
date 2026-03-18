@@ -26,12 +26,10 @@ import { AuthInterceptor } from './core/services/interceptor';
     AppComponent,
     DashboardComponent,
     HistoriqueComponent,
-    ProduitsComponent    
+    ProduitsComponent,
+    
   ],
-
   imports: [
-    BrowserModule,
-    RouterOutlet,
     NavbarComponent,
     CommonModule, 
     RouterModule,
@@ -39,21 +37,18 @@ import { AuthInterceptor } from './core/services/interceptor';
     FormsModule,
     HttpClientModule,
     CommonModule,
-    DecimalPipe,
-    FormsModule,
     MatSelectModule,
     MatCardModule,
     MatTableModule,
     MatInputModule,
     MatChipsModule,
-    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
     CommonModule,
     HttpClientModule
   ],
-  providers: [
+  providers: [DecimalPipe
     {
       provide:  HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
@@ -62,4 +57,4 @@ import { AuthInterceptor } from './core/services/interceptor';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}
