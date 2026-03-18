@@ -38,6 +38,10 @@ export class ProduitsComponent implements OnInit {
   poissons: ProduitForm[] = [];
   fruitsDesMer: ProduitForm[] = [];
   crustaces: ProduitForm[] = [];
+  formPrixPromo : any = 0;
+  formPrix: any = 0;
+  formPromo: any = 0;
+
 
   constructor(
     private produitsService: ProduitsService,
@@ -69,7 +73,6 @@ export class ProduitsComponent implements OnInit {
       erreurPrixMouvement: ''
     });
     this.poissons = produits.filter(p => p.categorie === 0).map(toForm);
-    console.log(this.poissons);
     this.fruitsDesMer = produits.filter(p => p.categorie === 1).map(toForm);
     this.crustaces = produits.filter(p => p.categorie === 2).map(toForm);
   }
@@ -158,7 +161,25 @@ export class ProduitsComponent implements OnInit {
       }
 
       if (Object.keys(changes).length > 0) {
-        //this.produitsService.updateProduit(pf.produit.id, changes);
+        if(pf.nouveauPrix != null){
+          this.formPrixPromo = pf.nouveauPrix * (1 - pf.produit.promo / 100)
+        }else{
+          this.formPrixPromo = pf.produit.prix * (1 - pf.produit.promo / 100)
+        }
+
+        pf.nouveauPrix != null ? this.formPrix = pf.nouveauPrix : this.formPrix = pf.produit.prix
+        
+        pf.nouveauPourcentage != null ? this.formPromo = pf.nouveauPourcentage : this.formPromo = pf.produit.promo
+
+
+        const postForm = {
+          "prix": this.formPrix,
+          "prixPromo": this.formPrixPromo,
+          "promo": this.formPromo
+        }
+
+        this.produitsService.postProduit(pf.produit.id, postForm)
+        this.chargerProduits();
         nbModifs++;
       }
     });

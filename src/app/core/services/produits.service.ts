@@ -8,7 +8,7 @@ export class ProduitsService {
 
   constructor(private http: HttpClient) {}
 
-  token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczODMxMjc5LCJpYXQiOjE3NzM4Mjc2NzksImp0aSI6IjcyODkyNjhmYjAzODRlYTg5NGE5ZDBhMzE5YTUzZTk4IiwidXNlcl9pZCI6IjMifQ.1uqS0AY4UoxmPmFLDbMfvqSHsQpXUYy02fEny9GsiC8";
+  token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczODQ1NzQyLCJpYXQiOjE3NzM4NDIxNDIsImp0aSI6Ijc1YjI1Mzk2Y2NlMDRmZGFiNWEzZDY4YWY3ZWYxM2Y1IiwidXNlcl9pZCI6IjMifQ.hxT_fmYgIbd64jwC0y6FOMmHc7rwANbGbjS549mitTo";
 
   httpHeaders = new HttpHeaders({
     Authorization: `Bearer ${this.token}`
@@ -37,5 +37,17 @@ export class ProduitsService {
     return this.getProduits().pipe(
       map(produits => produits.filter(p => p.categorie === 2))
     );
+  }
+
+  postProduit(id: number, data : any): void{
+    this.http.patch("http://127.0.0.1:8000/produit/" + id + '/', data, {headers: this.httpHeaders}).subscribe({
+      next: (res) => {
+        alert('Données envoyés')
+      },
+      error: (err) =>{
+        console.log(data)
+        alert("Erreur lors de l'envoi de données")
+      }
+    })
   }
 }
