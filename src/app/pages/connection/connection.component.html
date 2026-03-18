@@ -1,0 +1,107 @@
+<div class="ocean-bg">
+  <div class="waves-container">
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+      <defs>
+        <path id="wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/>
+      </defs>
+      <g class="wave-parallax">
+        <use href="#wave" x="48" y="0" class="wave wave-1"/>
+        <use href="#wave" x="48" y="3" class="wave wave-2"/>
+        <use href="#wave" x="48" y="5" class="wave wave-3"/>
+        <use href="#wave" x="48" y="7" class="wave wave-4"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="bubbles">
+    <span class="bubble" *ngFor="let b of bubbles" [style.left]="b.left" [style.animationDuration]="b.duration" [style.width]="b.size" [style.height]="b.size"></span>
+  </div>
+
+  <div class="card-wrapper">
+    <div class="login-card" [class.floating]="isFloating" (click)="toggleFloat()">
+      <div class="brand">
+        <img src="./public/logo-bateau-thibault.png" alt="Bateau Thibault" class="brand-logo" />
+        <h1 class="brand-name">Bateau Thibault</h1>
+        <p class="brand-tagline">Poissonnerie & Fruits de mer</p>
+        </div>
+      <h2 class="form-title">Connexion</h2>
+
+      <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <div class="field-group">
+          <label class="field-label" for="email">Adresse email</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="loginData.email"
+              required
+              placeholder="votre@email.com"
+              class="form-input"
+              autocomplete="email"
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="password">Mot de passe</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              name="password"
+              [(ngModel)]="loginData.password"
+              required
+              placeholder="••••••••"
+              class="form-input"
+              autocomplete="current-password"
+            />
+            <button type="button" class="toggle-pw" (click)="togglePassword()">
+              <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" name="remember" [(ngModel)]="loginData.remember" class="checkbox-input"/>
+            <span class="checkbox-custom"></span>
+            Se souvenir de moi
+          </label>
+          <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+        </div>
+        <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <button type="submit" class="btn-submit" [disabled]="loginForm.invalid || isLoading">
+          <span *ngIf="!isLoading">Se connecter</span>
+          <span *ngIf="isLoading" class="loader"></span>
+        </button>
+
+        <div class="divider"><span>ou</span></div>
+
+        <p class="register-link">
+          Pas encore de compte ?
+          <a routerLink="/inscription">Créer un compte</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
