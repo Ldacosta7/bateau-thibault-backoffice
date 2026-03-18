@@ -71,14 +71,14 @@ export class HistoriqueComponent implements OnInit {
   }
   
 
- getLabelCategorie(cat: number): string {
-  const map: Record<number, string> = {
-    0: 'Poisson',
-    1: 'Fruit de mer',
-    2: 'Crustacé'
-  };
-  return map[cat] || '—';
-}
+  getLabelCategorie(cat: number): string {
+    const map: Record<number, string> = {
+      0: 'Poisson',
+      1: 'Fruit de mer',
+      2: 'Crustacé'
+    };
+    return map[cat] || '—';
+  }
 
   getLabelType(type: TypeMouvement): string {
     const map: Record<TypeMouvement, string> = {
