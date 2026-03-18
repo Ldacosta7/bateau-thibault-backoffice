@@ -75,7 +75,15 @@ export class MouvementsService {
   }
 
 
-  ajouterMouvement(produit: Produit, type: TypeMouvement, quantite: number, prixUnitaire: number){
-
+  postMouvements(data: any){
+    this.http.post('http://127.0.0.1:8000/journalisation/', data, {headers: this.httpHeaders}).subscribe({
+      next: (res) => {
+        null
+      },
+      error: (err) =>{
+        console.log(data)
+        console.error("Erreur lors de l'envoi de données")
+      }
+    })
   }
 }

@@ -41,6 +41,7 @@ export class ProduitsComponent implements OnInit {
   formPrixPromo : any = 0;
   formPrix: any = 0;
   formPromo: any = 0;
+  formTotal: any = 0;
 
 
   constructor(
@@ -75,7 +76,6 @@ export class ProduitsComponent implements OnInit {
     this.poissons = produits.filter(p => p.categorie === 0).map(toForm);
     this.fruitsDesMer = produits.filter(p => p.categorie === 1).map(toForm);
     this.crustaces = produits.filter(p => p.categorie === 2).map(toForm);
-    console.log(this.poissons)
 
   }
 
@@ -158,29 +158,50 @@ export class ProduitsComponent implements OnInit {
         changes.unite = nouveauxVendus;
 
         const prixFinal = pf.typeMouvement === 'retrait-par-invendus' ? 0 : (pf.prixMouvement ?? 0);
-        this.mouvementsService.ajouterMouvement(pf.produit, pf.typeMouvement, pf.quantiteMouvement, prixFinal);
+        //this.mouvementsService.ajouterMouvement(pf.produit, pf.typeMouvement, pf.quantiteMouvement, prixFinal);
         nbModifs++;
       }
 
       if (Object.keys(changes).length > 0) {
-        if(pf.nouveauPrix != null){
-          this.formPrixPromo = pf.nouveauPrix * (1 - pf.produit.promo / 100)
-        }else{
-          this.formPrixPromo = pf.produit.prix * (1 - pf.produit.promo / 100)
+
+        console.log(pf.produit.id);
+
+        if(pf.nouveauPrix != null || pf.nouveauPourcentage != null){
+            if(pf.nouveauPrix != null){
+              this.formPrixPromo = pf.nouveauPrix * (1 - pf.produit.promo / 100)
+            }else{
+              this.formPrixPromo = pf.produit.prix * (1 - pf.produit.promo / 100)
+            }
+
+            pf.nouveauPrix != null ? this.formPrix = pf.nouveauPrix : this.formPrix = pf.produit.prix
+            pf.nouveauPourcentage != null ? this.formPromo = pf.nouveauPourcentage : this.formPromo = pf.produit.promo
+
+            const postFormProduit = {
+              "prix": this.formPrix,
+              "prixPromo": this.formPrixPromo,
+              "promo": this.formPromo
+            }
+
+            console.log(postFormProduit);
+            this.produitsService.postProduit(pf.produit.id, postFormProduit);
         }
 
-        pf.nouveauPrix != null ? this.formPrix = pf.nouveauPrix : this.formPrix = pf.produit.prix
+        if(pf.quantiteMouvement != null || pf.prixMouvement != null ){
+    
+          pf.quantiteMouvement != null && pf.prixMouvement != null ? this.formTotal = pf.quantiteMouvement * pf.prixMouvement : undefined;
+          
+
+          const postFormHistorique = {
+            "produit": pf.produit.id,
+            "transaction": pf.typeMouvement,
+            "unite": pf.quantiteMouvement,
+            "prixUnitaire": pf.prixMouvement,
+            "montant": this.formTotal
+          }
+
+          this.mouvementsService.postMouvements(postFormHistorique);
+        }
         
-        pf.nouveauPourcentage != null ? this.formPromo = pf.nouveauPourcentage : this.formPromo = pf.produit.promo
-
-
-        const postForm = {
-          "prix": this.formPrix,
-          "prixPromo": this.formPrixPromo,
-          "promo": this.formPromo
-        }
-        console.log(postForm);
-        this.produitsService.postProduit(pf.produit.id, postForm)
         this.chargerProduits();
         nbModifs++;
       }
