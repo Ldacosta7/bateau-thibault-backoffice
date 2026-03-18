@@ -26,30 +26,26 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     AppComponent,
     DashboardComponent,
     HistoriqueComponent,
-    ProduitsComponent,    
+    ProduitsComponent,
+    
   ],
-
   imports: [
-    BrowserModule,
-    RouterOutlet,
     NavbarComponent,
+    BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
     CommonModule,
-    DecimalPipe,
-    FormsModule,
     MatSelectModule,
     MatCardModule,
     MatTableModule,
     MatInputModule,
     MatChipsModule,
-    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule
   ],
-  providers: [],
+  providers: [DecimalPipe],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

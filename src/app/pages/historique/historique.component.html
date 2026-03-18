@@ -1,54 +1,61 @@
 <h1>Historique des mouvements</h1>
 
+
 <div class="filtres">
+  <!-- Catégorie Filter -->
   <mat-form-field appearance="outline">
     <mat-label>Catégorie</mat-label>
     <mat-select [(ngModel)]="filtreCategorie" (ngModelChange)="actualiser()">
-      @for (c of categories; track c.valeur) {
-        <mat-option [value]="c.valeur">{{ c.label }}</mat-option>
-      }
+      <mat-option *ngFor="let c of categories" [value]="c.valeur">
+        {{ c.label }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 
+  <!-- Type de mouvement Filter -->
   <mat-form-field appearance="outline">
     <mat-label>Type de mouvement</mat-label>
     <mat-select [(ngModel)]="filtreType" (ngModelChange)="actualiser()">
-      @for (t of types; track t.valeur) {
-        <mat-option [value]="t.valeur">{{ t.label }}</mat-option>
-      }
+      <mat-option *ngFor="let t of types" [value]="t.valeur">
+        {{ t.label }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 
+  <!-- Nombre de résultats -->
   <span class="nb-resultats">{{ mouvements.length }} mouvement(s)</span>
 </div>
 
+<!-- Table des mouvements -->
 <table mat-table [dataSource]="mouvements" class="mat-elevation-z2">
 
   <ng-container matColumnDef="date">
     <th mat-header-cell *matHeaderCellDef>Date</th>
-    <td mat-cell *matCellDef="let m">{{ m.date | date:'dd/MM/yyyy HH:mm' }}</td>
+    <td mat-cell *matCellDef="let m">{{ m.date | date:'dd/MM/yyyy' }}</td>
   </ng-container>
 
   <ng-container matColumnDef="produit">
     <th mat-header-cell *matHeaderCellDef>Produit</th>
-    <td mat-cell *matCellDef="let m">{{ m.produitNom }}</td>
+    <td mat-cell *matCellDef="let m">{{ m.produit.nom }}</td>
   </ng-container>
 
   <ng-container matColumnDef="categorie">
     <th mat-header-cell *matHeaderCellDef>Catégorie</th>
-    <td mat-cell *matCellDef="let m">{{ getLabelCategorie(m.categorie) }}</td>
+    <td mat-cell *matCellDef="let m">{{ getLabelCategorie(m.produit.categorie) }}</td>
   </ng-container>
 
   <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef>Type</th>
     <td mat-cell *matCellDef="let m">
-      <span [class]="'badge-type ' + getClassType(m.type)">{{ getLabelType(m.type) }}</span>
+      <span [class]="'badge-type ' + getClassType(m.transaction)">
+        {{ getLabelType(m.type) }}
+      </span>
     </td>
   </ng-container>
 
   <ng-container matColumnDef="quantite">
     <th mat-header-cell *matHeaderCellDef>Quantité</th>
-    <td mat-cell *matCellDef="let m">{{ m.quantite }}</td>
+    <td mat-cell *matCellDef="let m">{{ m.unite }}</td>
   </ng-container>
 
   <ng-container matColumnDef="prixUnitaire">
@@ -58,14 +65,15 @@
 
   <ng-container matColumnDef="total">
     <th mat-header-cell *matHeaderCellDef>Total</th>
-    <td mat-cell *matCellDef="let m" class="total">{{ m.total > 0 ? (m.total + ' €') : '—' }}</td>
+    <td mat-cell *matCellDef="let m" class="total">{{ m.montant > 0 ? (m.montant + ' €') : '—' }}</td>
   </ng-container>
 
+  <!-- Header and Row Definitions -->
   <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
   <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
-
 </table>
 
-@if (mouvements.length === 0) {
-  <div class="vide">Aucun mouvement enregistré pour le moment.</div>
-}
+<!-- Empty State -->
+<div class="vide" *ngIf="mouvements.length === 0">
+  Aucun mouvement enregistré pour le moment.
+</div>
