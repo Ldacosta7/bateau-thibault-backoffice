@@ -75,10 +75,12 @@ export class ProduitsComponent implements OnInit {
     this.poissons = produits.filter(p => p.categorie === 0).map(toForm);
     this.fruitsDesMer = produits.filter(p => p.categorie === 1).map(toForm);
     this.crustaces = produits.filter(p => p.categorie === 2).map(toForm);
+    console.log(this.poissons)
+
   }
 
   getPrixPromo(pf: ProduitForm): string {
-    if (pf.produit.promo != 0) return '—';
+    if (pf.produit.promo == 0) return '—';
     const promo = pf.produit.prix * (1 - pf.produit.promo / 100);
     return promo.toFixed(2) + ' €';
   }
@@ -177,7 +179,7 @@ export class ProduitsComponent implements OnInit {
           "prixPromo": this.formPrixPromo,
           "promo": this.formPromo
         }
-
+        console.log(postForm);
         this.produitsService.postProduit(pf.produit.id, postForm)
         this.chargerProduits();
         nbModifs++;

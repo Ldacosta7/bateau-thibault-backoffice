@@ -42,11 +42,11 @@ export class ProduitsService {
   postProduit(id: number, data : any): void{
     this.http.patch("http://127.0.0.1:8000/produit/" + id + '/', data, {headers: this.httpHeaders}).subscribe({
       next: (res) => {
-        alert('Données envoyés')
+        null
       },
       error: (err) =>{
         console.log(data)
-        alert("Erreur lors de l'envoi de données")
+        console.error("Erreur lors de l'envoi de données")
       }
     })
   }
