@@ -16,11 +16,11 @@ export class HistoriqueComponent implements OnInit {
 
   colonnes = ['date', 'produit', 'categorie', 'type', 'quantite', 'prixUnitaire', 'total'];
 
-  filtreCategorie = undefined;
-  filtreType = '';
+  filtreCategorie = 'null';
+  filtreType = 'null';
 
   categories = [
-    { valeur: undefined, label: 'Toutes les catégories' },
+    { valeur: null, label: 'Toutes les catégories' },
     { valeur: 0, label: 'Poissons' },
     { valeur: 1, label: 'Fruits de mer' },
     { valeur: 2, label: 'Crustacés' }
@@ -44,7 +44,7 @@ export class HistoriqueComponent implements OnInit {
 
   appliquerFiltres(): void {
     this.mouvements = this.tousLesMouvements.filter(h => {
-      const matchCat  = !this.filtreCategorie || h.categorie === this.filtreCategorie;
+      const matchCat  = !this.filtreCategorie || h.produit.categorie == Number(this.filtreCategorie);
       const matchType = !this.filtreType      || h.transaction === this.filtreType;
       return matchCat && matchType;
     });
@@ -58,16 +58,16 @@ export class HistoriqueComponent implements OnInit {
     const historique = await firstValueFrom(this.mouvementsService.getHistorique());
     this.tousLesMouvements = historique;
     this.appliquerFiltres();
-    if(this.filtreCategorie == undefined && this.filtreType == ''){
+
+    if( this.filtreCategorie == "null" && this.filtreType == "null"){
       this.mouvements = historique;
-    }else if(this.filtreType != '' &&this.filtreCategorie != undefined){
-      this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie && h.transaction === this.filtreType);
-    }else if (this.filtreCategorie != undefined){
-      this.mouvements = historique.filter(h => h.categorie === this.filtreCategorie );
-    }else if (this.filtreType != ''){
+    }else if(this.filtreType != "null" && this.filtreCategorie != "null"){
+      this.mouvements = historique.filter(h => h.produit.categorie === Number(this.filtreCategorie) && h.transaction === this.filtreType);
+    }else if (this.filtreCategorie != "null"){
+      this.mouvements = historique.filter(h => h.produit.categorie === Number(this.filtreCategorie) );
+    }else if (this.filtreType != "null"){
       this.mouvements = historique.filter(h => h.transaction === this.filtreType );
     }
-    console.log(this.mouvements);
   }
   
 

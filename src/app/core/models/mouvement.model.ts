@@ -1,8 +1,10 @@
+import { Produit } from "./produit.model";
+
 export type TypeMouvement = 'ajout' | 'retrait-par-vente' | 'retrait-par-invendus';
 
 export interface Mouvement {
   id: number;
-  produitId: number;
+  produit: Produit;
   produitNom: string;
   categorie: number;
   transaction: TypeMouvement;
