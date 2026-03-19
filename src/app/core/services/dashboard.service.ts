@@ -26,6 +26,14 @@ export class DashboardService {
     private produitsService: ProduitsService
   ) {}
 
+  async getHistoriqueAchat(): Promise<Mouvement[]>{
+    return await firstValueFrom(this.mouvementsService.getHistoriqueFiltre(undefined, 'ajout'));
+  }
+
+  async getHistoriqueVentes(): Promise<Mouvement[]>{
+    return await firstValueFrom(this.mouvementsService.getHistoriqueFiltre(undefined, 'retrait-par-vente'));
+  }
+
   private getVentes(): Observable<Mouvement[]> {
     return this.mouvementsService.getHistoriqueFiltre(undefined, 'retrait-par-vente');
   }

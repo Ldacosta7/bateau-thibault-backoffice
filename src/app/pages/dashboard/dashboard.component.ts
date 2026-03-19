@@ -32,6 +32,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   tauxInvendus: { categorie: number; taux: number }[] = [];
   trimestres: KpiTrimestre[] = [];
   confettisActifs = false;
+  historiqueVente : any = null;
+  historiqueAchat : any = null;
 
   constructor(private dashboardService: DashboardService) {}
 
@@ -49,17 +51,50 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     setTimeout(() => this.creerTousLesGraphiques(), 100);
   }
 
-  chargerKpis(): void {
+  async chargerKpis(): Promise<void> {
+    this.historiqueAchat = await this.dashboardService.getHistoriqueAchat();
+    this.historiqueVente = await this.dashboardService.getHistoriqueVentes();
+    console.log(this.historiqueVente, this.historiqueAchat);
+
     const annee = this.anneeSelectionnee;
-    this.caTotal = this.dashboardService.getCATotal(annee);
-    this.margeAnnuelle = this.dashboardService.getMargeAnnuelle(annee);
-    this.impotPrevisionnel = this.dashboardService.getImpotPrevisionnel(annee);
+    this.caTotal = this.getCaTotal();
+    this.margeAnnuelle = this.getMargeAnnuelle();
+    this.impotPrevisionnel = this .getImpotPrevisionnel();
     this.valeurStock = this.dashboardService.getValeurStock();
     this.top3 = this.dashboardService.getTop3Vendus();
     this.rupturesStock = this.dashboardService.getProduitsSousSeuilStock(5);
     this.tauxInvendus = this.dashboardService.getTauxInvendusParCategorie();
     this.trimestres = this.dashboardService.getCAParTrimestre(annee);
     this.confettisActifs = this.trimestres.some(t => t.confettis);
+  }
+
+  getCaTotal(){
+    let somme = 0;
+    this.historiqueVente.forEach((element: { montant: number; date: Date }) => {
+      if(new Date(element.date).getFullYear() === this.anneeSelectionnee){
+        somme = somme + element.montant;
+      }
+    });
+
+    return somme;
+  }
+
+  getMargeAnnuelle(){
+    let ca = this.getCaTotal();
+    let achats = 0;
+    this.historiqueAchat.forEach((element: { date: Date; montant: number; }) => {
+      if(new Date(element.date).getFullYear() === this.anneeSelectionnee){
+        achats = element.montant
+      }
+    });
+
+    return ca - achats;
+  }
+
+  getImpotPrevisionnel(){
+    let margeAnnuelle = this.getMargeAnnuelle();
+
+    return margeAnnuelle > 0 ? margeAnnuelle * 0.3 : 0;
   }
 
   detruireTousLesGraphiques(): void {

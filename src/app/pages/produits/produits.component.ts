@@ -189,8 +189,8 @@ export class ProduitsComponent implements OnInit {
         if(pf.quantiteMouvement != null || pf.prixMouvement != null ){
     
           pf.quantiteMouvement != null && pf.prixMouvement != null ? this.formTotal = pf.quantiteMouvement * pf.prixMouvement : undefined;
-          
-
+          let stock = 0;
+          pf.quantiteMouvement != null ? stock = pf.produit.stock + pf.quantiteMouvement : undefined;
           const postFormHistorique = {
             "produit": pf.produit.id,
             "transaction": pf.typeMouvement,
@@ -199,7 +199,13 @@ export class ProduitsComponent implements OnInit {
             "montant": this.formTotal
           }
 
+          const postFormProduitStock = {
+            "stock": stock
+          }
+
           this.mouvementsService.postMouvements(postFormHistorique);
+          this.produitsService.postProduit(pf.produit.id, postFormProduitStock);
+
         }
         
         this.chargerProduits();

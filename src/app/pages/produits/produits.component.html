@@ -89,18 +89,17 @@
           <th mat-header-cell *matHeaderCellDef>Stock</th>
           <td mat-cell *matCellDef="let pf">
             <div class="stock-wrapper">
-              <span class="stock-value" [class.stock-bas]="pf.produit.quantiteStock < 5">
-                {{ pf.produit.quantiteStock }}
+              <span class="stock-value" [class.stock-bas]="pf.produit.stock < 5">
+                {{ pf.produit.stock }}
               </span>
-              <span class="stock-label" *ngIf="pf.produit.quantiteStock < 5">Stock bas</span>
+              <span class="stock-label" *ngIf="pf.produit.stock < 5">Stock bas</span>
             </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="vendus">
-          <th mat-header-cell *matHeaderCellDef>Vendus</th>
+          <th mat-header-cell *matHeaderCellDef> </th>
           <td mat-cell *matCellDef="let pf">
-            <span class="vendus-value">{{ pf.produit.nombreVendus }}</span>
           </td>
         </ng-container>
 
