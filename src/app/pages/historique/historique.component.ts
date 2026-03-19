@@ -16,21 +16,22 @@ export class HistoriqueComponent implements OnInit {
 
   colonnes = ['date', 'produit', 'categorie', 'type', 'quantite', 'prixUnitaire', 'total'];
 
-  filtreCategorie = 'null';
-  filtreType = 'null';
+  // FIX : null/undefined réels au lieu des strings 'null'/'undefined'
+  filtreCategorie: number | null = null;
+  filtreType: string | null = null;
 
   categories = [
-    { valeur: null, label: 'Toutes les catégories' },
-    { valeur: 0, label: 'Poissons' },
-    { valeur: 1, label: 'Fruits de mer' },
-    { valeur: 2, label: 'Crustacés' }
+    { valeur: null,  label: 'Toutes les catégories' },
+    { valeur: 0,     label: 'Poissons'               },
+    { valeur: 1,     label: 'Fruits de mer'           },
+    { valeur: 2,     label: 'Crustacés'               }
   ];
 
   types = [
-    { valeur: undefined, label: 'Tous les types' },
-    { valeur: 'ajout', label: 'Ajout de stock' },
-    { valeur: 'retrait-par-vente', label: 'Vente' },
-    { valeur: 'retrait-par-invendus', label: 'Invendus' }
+    { valeur: null,                  label: 'Tous les types' },
+    { valeur: 'ajout',               label: 'Ajout de stock' },
+    { valeur: 'retrait-par-vente',   label: 'Vente'          },
+    { valeur: 'retrait-par-invendus', label: 'Invendus'      }
   ];
 
   mouvements: Mouvement[] = [];
@@ -42,12 +43,18 @@ export class HistoriqueComponent implements OnInit {
     this.actualiser();
   }
 
+  // FIX : une seule méthode de filtrage, appelée à chaque changement
   appliquerFiltres(): void {
-    this.mouvements = this.tousLesMouvements.filter(h => {
-      const matchCat  = !this.filtreCategorie || h.produit.categorie == Number(this.filtreCategorie);
-      const matchType = !this.filtreType      || h.transaction === this.filtreType;
+    this.mouvements = this.tousLesMouvements.filter(m => {
+      const matchCat  = this.filtreCategorie === null || m.categorie === this.filtreCategorie;
+      const matchType = this.filtreType      === null || m.transaction === this.filtreType;
       return matchCat && matchType;
     });
+
+    console.log(
+      `[Historique] Filtres appliqués — catégorie: ${this.filtreCategorie} | type: ${this.filtreType}`,
+      `→ ${this.mouvements.length} / ${this.tousLesMouvements.length} mouvements`
+    );
   }
 
   countByType(type: string): number {
@@ -57,40 +64,35 @@ export class HistoriqueComponent implements OnInit {
   async actualiser(): Promise<void> {
     const historique = await firstValueFrom(this.mouvementsService.getHistorique());
     this.tousLesMouvements = historique;
-    this.appliquerFiltres();
 
-    if( this.filtreCategorie == "null" && this.filtreType == "null"){
-      this.mouvements = historique;
-    }else if(this.filtreType != "null" && this.filtreCategorie != "null"){
-      this.mouvements = historique.filter(h => h.produit.categorie === Number(this.filtreCategorie) && h.transaction === this.filtreType);
-    }else if (this.filtreCategorie != "null"){
-      this.mouvements = historique.filter(h => h.produit.categorie === Number(this.filtreCategorie) );
-    }else if (this.filtreType != "null"){
-      this.mouvements = historique.filter(h => h.transaction === this.filtreType );
-    }
+    console.log(`[Historique] ${historique.length} mouvements chargés`, historique[0]);
+
+    // FIX : on ne double plus la logique ici, appliquerFiltres() fait tout
+    this.appliquerFiltres();
   }
-  
 
   getLabelCategorie(cat: number): string {
     const map: Record<number, string> = {
-      0: 'Poisson',
-      1: 'Fruit de mer',
-      2: 'Crustacé'
+      0: 'Poisson', 1: 'Fruit de mer', 2: 'Crustacé'
     };
-    return map[cat] || '—';
+    return map[cat] ?? '—';
   }
 
   getLabelType(type: TypeMouvement): string {
     const map: Record<TypeMouvement, string> = {
-      'ajout': 'Ajout', 'retrait-par-vente': 'Vente', 'retrait-par-invendus': 'Invendus'
+      'ajout':               'Ajout',
+      'retrait-par-vente':   'Vente',
+      'retrait-par-invendus': 'Invendus'
     };
-    return map[type];
+    return map[type] ?? type;
   }
 
   getClassType(type: TypeMouvement): string {
     const map: Record<TypeMouvement, string> = {
-      'ajout': 'badge-ajout', 'retrait-par-vente': 'badge-vente', 'retrait-par-invendus': 'badge-invendus'
+      'ajout':               'badge-ajout',
+      'retrait-par-vente':   'badge-vente',
+      'retrait-par-invendus': 'badge-invendus'
     };
-    return map[type];
+    return map[type] ?? '';
   }
 }

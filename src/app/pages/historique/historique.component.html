@@ -36,9 +36,9 @@
         <div class="filter-group">
           <label class="filter-label">Catégorie</label>
           <div class="select-wrapper">
-            <select class="ocean-select" [(ngModel)]="filtreCategorie" (ngModelChange)="actualiser()">
+            <select class="ocean-select" [(ngModel)]="filtreCategorie" (ngModelChange)="appliquerFiltres()">
               @for (c of categories; track c.valeur) {
-                <option [value]="c.valeur">{{ c.label }}</option>
+                <option [ngValue]="c.valeur">{{ c.label }}</option>
               }
             </select>
             <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -50,9 +50,9 @@
         <div class="filter-group">
           <label class="filter-label">Type de mouvement</label>
           <div class="select-wrapper">
-            <select class="ocean-select" [(ngModel)]="filtreType" (ngModelChange)="actualiser()">
+            <select class="ocean-select" [(ngModel)]="filtreType" (ngModelChange)="appliquerFiltres()">
               @for (t of types; track t.valeur) {
-                <option [value]="t.valeur">{{ t.label }}</option>
+                <option [ngValue]="t.valeur">{{ t.label }}</option>
               }
             </select>
             <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -96,21 +96,23 @@
           <ng-container matColumnDef="produit">
             <th mat-header-cell *matHeaderCellDef>Produit</th>
             <td mat-cell *matCellDef="let m">
-              <span class="produit-nom">{{ m.produit.nom }}</span>
+              <span class="produit-nom">{{ m.produitNom }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="categorie">
             <th mat-header-cell *matHeaderCellDef>Catégorie</th>
             <td mat-cell *matCellDef="let m">
-              <span class="categorie-badge">{{ getLabelCategorie(m.produit.categorie) }}</span>
+              <!-- FIX : m.categorie (top-level) au lieu de m.produit.categorie -->
+              <span class="categorie-badge">{{ getLabelCategorie(m.categorie) }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="type">
             <th mat-header-cell *matHeaderCellDef>Type</th>
             <td mat-cell *matCellDef="let m">
-              <span [class]="'badge-type ' + getClassType(m.type)">
+              <!-- FIX : getClassType(m.transaction) — m.type n'existe pas sur Mouvement -->
+              <span [class]="'badge-type ' + getClassType(m.transaction)">
                 {{ getLabelType(m.transaction) }}
               </span>
             </td>
@@ -119,7 +121,8 @@
           <ng-container matColumnDef="quantite">
             <th mat-header-cell *matHeaderCellDef>Quantité</th>
             <td mat-cell *matCellDef="let m">
-              <span class="quantite">{{ m.unite }}</span>
+              <!-- FIX : m.quantite (mappé depuis m.unite) -->
+              <span class="quantite">{{ m.quantite }}</span>
             </td>
           </ng-container>
 
@@ -133,8 +136,11 @@
           <ng-container matColumnDef="total">
             <th mat-header-cell *matHeaderCellDef>Total</th>
             <td mat-cell *matCellDef="let m">
-              <span class="total" [class.total-positif]="m.type === 'retrait-par-vente'" [class.total-negatif]="m.type === 'ajout'">
-                {{ m.montant > 0 ? (m.montant | number:'1.2-2') + ' €' : '—' }}
+              <!-- FIX : m.total (mappé depuis m.montant) + classe basée sur m.transaction -->
+              <span class="total"
+                [class.total-positif]="m.transaction === 'retrait-par-vente'"
+                [class.total-negatif]="m.transaction === 'ajout'">
+                {{ m.total > 0 ? (m.total | number:'1.2-2') + ' €' : '—' }}
               </span>
             </td>
           </ng-container>
