@@ -190,7 +190,12 @@ export class ProduitsComponent implements OnInit {
     
           pf.quantiteMouvement != null && pf.prixMouvement != null ? this.formTotal = pf.quantiteMouvement * pf.prixMouvement : undefined;
           let stock = 0;
-          pf.quantiteMouvement != null ? stock = pf.produit.stock + pf.quantiteMouvement : undefined;
+          if(pf.typeMouvement == 'retrait-par-vente'){
+            pf.quantiteMouvement != null ? stock = pf.produit.stock - pf.quantiteMouvement : undefined;
+          }else if (pf.typeMouvement == 'ajout'){
+            pf.quantiteMouvement != null ? stock = pf.produit.stock + pf.quantiteMouvement : undefined;
+          }
+
           const postFormHistorique = {
             "produit": pf.produit.id,
             "transaction": pf.typeMouvement,
