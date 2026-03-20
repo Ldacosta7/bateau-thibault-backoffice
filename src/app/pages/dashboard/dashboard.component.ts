@@ -19,8 +19,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private viewReady = false;
   private dataReady = false;
 
-  anneeSelectionnee = 2026;
-  annees = [2026, 2025, 2024, 2023];
+  anneeSelectionnee = "2026";
+  annees = ["2026", "2025", "2024", "2023"];
 
   // KPIs affichés
   caTotal           = 0;
@@ -57,6 +57,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   async chargerKpis(): Promise<void> {
     this.dataReady = false;
     const annee = this.anneeSelectionnee;
+    console.log(annee);
     console.log(`\n[Dashboard] ── Chargement pour l'année ${annee} ──`);
 
     // Chargement parallèle des 3 historiques
@@ -73,10 +74,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     );
 
     // ── KPIs ──────────────────────────────────────────────────────────────────
-    this.caTotal           = this.computeCaTotal(annee);
-    this.margeAnnuelle     = this.computeMargeAnnuelle(annee);
+    this.caTotal           = this.computeCaTotal(Number(annee));
+    this.margeAnnuelle     = this.computeMargeAnnuelle(Number(annee));
     this.impotPrevisionnel = this.margeAnnuelle > 0 ? this.margeAnnuelle * 0.3 : 0;
-    this.trimestres        = this.computeCAParTrimestre(annee);
+    this.trimestres        = this.computeCAParTrimestre(Number(annee));
     this.tauxInvendus      = this.computeTauxInvendusParCategorie();
     this.confettisActifs   = this.trimestres.some(t => t.confettis);
 
@@ -195,7 +196,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       const achat = this.sumTotal(this.filterByYearAndMonth(this.historiqueAchat,  annee, i));
       return { label, chiffreAffaires: ca, marge: ca - achat };
     });
-    console.log(`[Dashboard] computeCAParMois(${annee}) :`, data);
     return data;
   }
 
@@ -236,7 +236,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       console.warn('[Dashboard] barChartRef introuvable — graphique barres ignoré');
       return;
     }
-    const mois = this.computeCAParMois(this.anneeSelectionnee);
+    const mois = this.computeCAParMois(Number(this.anneeSelectionnee));
     const chart = new Chart(this.barChartRef.nativeElement, {
       type: 'bar',
       data: {
@@ -262,7 +262,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       console.warn('[Dashboard] pieChartRef introuvable — graphique camembert ignoré');
       return;
     }
-    const data = this.computeCAParCategorie(this.anneeSelectionnee);
+    const data = this.computeCAParCategorie(Number(this.anneeSelectionnee));
     const chart = new Chart(this.pieChartRef.nativeElement, {
       type: 'doughnut',
       data: {
@@ -296,7 +296,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       console.warn('[Dashboard] groupedChartRef introuvable — graphique groupé ignoré');
       return;
     }
-    const data = this.computeVentesVsInvendus(this.anneeSelectionnee);
+    const data = this.computeVentesVsInvendus(Number(this.anneeSelectionnee));
     const chart = new Chart(this.groupedChartRef.nativeElement, {
       type: 'bar',
       data: {
